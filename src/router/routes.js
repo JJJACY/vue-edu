@@ -1,9 +1,9 @@
-const eduLogin = () =>
-  import(/* webpackChunkName: "account" */ "@/views/eduLogin.vue");
 const Dashboard = () =>
   import(/* webpackChunkName: "Dashboard" */ "@/views/Dashboard.vue");
+const eduLogin = () =>
+  import(/* webpackChunkName: "eduLogin" */ "@/views/eduLogin.vue");
 const eduLesson = () =>
-  import(/* webpackChunkName: "account" */ "@/views/eduLesson.vue");
+  import(/* webpackChunkName: "lesson" */ "@/views/eduLesson.vue");
 
 import BasicLayout from "@/components/BasicLayout.vue";
 
@@ -14,20 +14,50 @@ export default [
     name: "eduLogin"
   },
   {
-    path: "/admin",
+    path: "/",
     component: BasicLayout,
-    name: "Root",
+    name: "admin",
     redirect: { name: "Dashboard" },
     children: [
       {
         path: "/admin",
-        component: Dashboard,
-        name: "Dashboard"
+        component: { render: h => h("router-view") },
+        name: "Dashboard",
+        // meta: {
+        //   nav: {
+        //     icon: "el-icon-pie-chart",
+        //     title: "概况"
+        //   },
+        //   breadcrumb: {
+        //     title: "概况"
+        //   }
+        // },
+        children: [
+          {
+            path: "/admin",
+            name: "Dashboard",
+            component: Dashboard
+          }
+        ]
       },
       {
-        path: "/lesson",
-        component: eduLesson,
-        name: "eduLesson"
+        path: "/admin/lesson",
+        name: "eduLessonRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "eduLesson" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "课程管理"
+          }
+        },
+        children: [
+          {
+            path: "/admin/lesson",
+            name: "eduLesson",
+            component: eduLesson
+          }
+        ]
       }
     ]
   }

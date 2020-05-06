@@ -2,14 +2,24 @@
   <div class="sider-section">
     <div class="logo-section">
       <img class="logo-img" src="~@/assets/logo.png" alt="" />
-      <span>Vue Element Pro</span>
+      <span>极客 EDU</span>
     </div>
-    <div class="menu-section"></div>
+    <div class="menu-section">
+      <Sidermenu />
+    </div>
   </div>
 </template>
 
 <script>
-export default {};
+import Sidermenu from "./BasicLayoutSiderMenu";
+export default {
+  data() {
+    return {};
+  },
+  components: {
+    Sidermenu
+  }
+};
 </script>
 
 <style type="text/css" lang="less">

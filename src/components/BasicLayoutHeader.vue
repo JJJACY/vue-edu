@@ -1,6 +1,6 @@
 <template>
   <div class="header-section">
-    <div class="header-hd"></div>
+    <Breadcrumb />
     <div class="header-bd"></div>
     <div class="header-ft">
       <div class="bar-info-container">
@@ -21,7 +21,12 @@
 </template>
 
 <script>
-export default {};
+import Breadcrumb from "@/components/BasicBreadcrumb.vue";
+export default {
+  components: {
+    Breadcrumb
+  }
+};
 </script>
 
 <style lang="less" scoped>
