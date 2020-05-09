@@ -4,6 +4,10 @@ const eduLogin = () =>
   import(/* webpackChunkName: "eduLogin" */ "@/views/eduLogin.vue");
 const eduLesson = () =>
   import(/* webpackChunkName: "lesson" */ "@/views/eduLesson.vue");
+const eduLessoncreate = () =>
+  import(/* webpackChunkName: "lessoncreate" */ "@/views/eduLessoncreate.vue");
+const eduLessonedit = () =>
+  import(/* webpackChunkName: "lessonedit" */ "@/views/eduLessonedit.vue");
 
 import BasicLayout from "@/components/BasicLayout.vue";
 
@@ -49,6 +53,9 @@ export default [
           nav: {
             icon: "el-icon-collection-tag",
             title: "课程管理"
+          },
+          breadcrumb: {
+            title: "课程管理"
           }
         },
         children: [
@@ -56,6 +63,26 @@ export default [
             path: "/admin/lesson",
             name: "eduLesson",
             component: eduLesson
+          },
+          {
+            path: "/admin/lesson/create",
+            name: "eduLessoncreate",
+            component: eduLessoncreate,
+            meta: {
+              breadcrumb: {
+                title: "课程创建"
+              }
+            }
+          },
+          {
+            path: "/admin/lesson/edit",
+            name: "eduLessonedit",
+            component: eduLessonedit,
+            meta: {
+              breadcrumb: {
+                title: "课程编辑"
+              }
+            }
           }
         ]
       }

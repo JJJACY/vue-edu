@@ -1,19 +1,18 @@
 <template>
   <div class="header-section">
-    <Breadcrumb />
+    <v-bread class="header-hd" />
     <div class="header-bd"></div>
     <div class="header-ft">
-      <div class="bar-info-container">
-        <i class="el-icon-question"></i>
-      </div>
-      <el-dropdown style="height: 100%;">
+      <el-dropdown style="height:100%;" @command="handleCommand">
         <div class="bar-info-container">
           <i class="el-icon-user-solid userInfo-avatar"></i>
-          <span class="userInfo-name">Jax</span>
+          <span class="userInfo-name">{{ name }}</span>
           <i class="el-icon-arrow-down el-icon--right"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="el-icon-video-pause">退出</el-dropdown-item>
+          <el-dropdown-item icon="el-icon-video-pause" command="out"
+            >退出</el-dropdown-item
+          >
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -21,59 +20,88 @@
 </template>
 
 <script>
-import Breadcrumb from "@/components/BasicBreadcrumb.vue";
+import DataStore from "@/global/storage/index";
+import Bread from "./BasicBreadcrumb";
+
 export default {
+  data() {
+    return {
+      name: ""
+    };
+  },
+  created() {
+    // this.name = DataStore.getName();
+  },
+  props: {
+    collapse: {
+      type: Boolean,
+      default: false
+    }
+  },
   components: {
-    Breadcrumb
+    "v-bread": Bread
+  },
+  methods: {
+    handleCollapse() {
+      this.$emit("update:collapse", !this.collapse);
+    },
+    handleCommand() {
+      console.log(123);
+      this.$router.replace({ name: "eduLogin" });
+      console.log(456);
+      DataStore.clear();
+    }
   }
 };
 </script>
 
 <style lang="less" scoped>
 .header-section {
+  border-left: 1px solid rgb(223, 222, 222);
   position: relative;
-  padding: 0 16px;
-  height: 64px;
-  display: flex;
-  z-index: 10;
+  padding: 0 20px;
   background-color: #fff;
-  box-shadow: 0 2px 8px #f0f1f2;
+  height: 64px;
+  z-index: 10;
+  display: flex;
+  box-shadow: 0px 2px 15px 0 rgba(0, 0, 0, 0.06);
   .header-bd {
     flex: 1;
   }
-}
-
-.header-hd,
-.header-bd,
-.header-ft {
-  display: flex;
-  align-items: center;
-}
-
-.bar-info-container {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding: 0 10px;
-  transition: all 0.2s ease;
-  cursor: pointer;
-  &:hover {
-    background-color: #ecf5ff;
+  .header-bd,
+  .header-hd,
+  .header-ft {
+    display: flex;
+    align-items: center;
   }
-  .userInfo-name {
-    font-size: 14px;
-    vertical-align: middle;
-  }
-  .userInfo-avatar {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
-    text-align: center;
-    background-color: #ccc;
-    border-radius: 50%;
-    outline: none;
-    margin: 0 10px;
+  .bar-info-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    &:hover {
+      background-color: #ecf5ff;
+    }
+    .userInfo-name {
+      font-size: 14px;
+      vertical-align: middle;
+    }
+    .userInfo-avatar {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      background-color: rgb(189, 187, 187);
+      border-radius: 50%;
+      outline: none;
+      margin: 0 10px;
+    }
+    .el-icon--right {
+      margin-left: 10px;
+    }
   }
 }
 </style>
