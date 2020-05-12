@@ -222,8 +222,8 @@
 
 <script>
 import DataStore from "@/global/storage/index.js";
-import NoteService from "@/global/service/Note.js";
-import AdminService from "@/global/service/Admin.js";
+import noteService from "@/global/service/note.js";
+import adminService from "@/global/service/admin.js";
 export default {
   data() {
     return {
@@ -266,8 +266,9 @@ export default {
   },
   created() {
     let token = DataStore.getToken();
+    console.log(token, 111111);
     if (token) {
-      return this.$router.replace({ name: "eduLogin" });
+      return this.$router.replace({ name: "Dashboard" }); //eduLesson
     }
   },
   methods: {
@@ -295,7 +296,7 @@ export default {
         if (!phone || phone.length < 11) {
           return this.$message.error("请输入正确手机号码");
         }
-        NoteService.send({ phone }).then(res => {
+        noteService.send({ phone }).then(res => {
           console.log(res, 111);
           if (res.code === 200) {
             this.$notify({
@@ -328,8 +329,8 @@ export default {
       if (!phone || !password) {
         return this.$message.error("请先输入账号密码");
       }
-      AdminService.adminlogin({ phone, password }).then(res => {
-        console.log(res);
+      adminService.adminlogin({ phone, password }).then(res => {
+        console.log(res.token, 55555);
         if (res.code === 200) {
           DataStore.setToken(res.token);
           // DataStore.setName(res.data.name);
@@ -338,7 +339,7 @@ export default {
             type: "success",
             message: res.message
           });
-          this.$router.replace({ name: "Dashboard" });
+          this.$router.replace({ name: "eduLesson" });
         } else {
           this.$message({
             type: "fail",

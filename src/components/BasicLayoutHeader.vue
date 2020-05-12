@@ -29,9 +29,6 @@ export default {
       name: ""
     };
   },
-  created() {
-    // this.name = DataStore.getName();
-  },
   props: {
     collapse: {
       type: Boolean,
@@ -41,14 +38,15 @@ export default {
   components: {
     "v-bread": Bread
   },
+  created() {
+    let token = DataStore.getToken();
+    if (!token) return this.$router.push({ path: "/login" });
+  },
   methods: {
     handleCollapse() {
       this.$emit("update:collapse", !this.collapse);
     },
     handleCommand() {
-      console.log(123);
-      this.$router.replace({ name: "eduLogin" });
-      console.log(456);
       DataStore.clear();
     }
   }
