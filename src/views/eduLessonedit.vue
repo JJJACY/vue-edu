@@ -54,95 +54,100 @@
       <div class="basic-title">
         <p class="text">课程章节</p>
       </div>
-      <div class="chapters-list" :data="Chapdata">
-        <div class="chapters-item">
-          <div class="chapters-chap">
-            <i class="el-icon-s-flag"></i>
-            <p class="chapters-num">{{ Chapdata[0].chap }}</p>
-            <div class="dots" @click="dialogFormVisible = true">···</div>
-            <el-dialog title="第一章" :visible.sync="dialogFormVisible">
-              <el-form :model="form">
-                <el-form-item
-                  label="请编辑章节名称"
-                  :label-width="formLabelWidth"
-                >
-                  <el-input v-model="form.name" autocomplete="off"></el-input>
-                </el-form-item>
-              </el-form>
-              <div slot="footer" class="dialog-footer">
-                <el-button @click="handleCancel()">取 消</el-button>
-                <el-button type="primary" @click="handleConfirm()"
-                  >确 定</el-button
-                >
-              </div>
-            </el-dialog>
+      <draggable v-model="Chapdata" class="chapters-list" v-show="hidden">
+        <transition-group>
+          <div v-for="item in Chapdata" :key="item.id" class="chapter-section">
+            <div class="chapter-title">
+              <i class="el-icon-s-flag"></i>
+              <div class="title">{{ item.chap }}</div>
+              <div class="dots" @click="dialogFormVisible = true">···</div>
+              <el-dialog title="第一章" :visible.sync="dialogFormVisible">
+                <el-form :model="form">
+                  <el-form-item
+                    label="请编辑章节名称"
+                    :label-width="formLabelWidth"
+                  >
+                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                  </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                  <el-button @click="handleCancel()">取 消</el-button>
+                  <el-button type="primary" @click="handleConfirm()"
+                    >确 定</el-button
+                  >
+                </div>
+              </el-dialog>
+            </div>
+            <div class="joint-list">
+              <draggable v-model="Jointdata" class="joint-list">
+                <transition-group>
+                  <div
+                    v-for="item in Jointdata"
+                    :key="item.id"
+                    class="joint-section"
+                  >
+                    <div class="joint-title no-title-line">
+                      <i class="el-icon-star-on"></i>
+                      <div class="title title-text">{{ item.joint }}</div>
+                      <el-button
+                        type="text"
+                        class="dot"
+                        style=" padding: 0;"
+                        @click="dialogVisible = true"
+                        >···</el-button
+                      >
+                      <el-dialog
+                        :visible.sync="dialogVisible"
+                        :before-close="handleClose"
+                      >
+                        <span slot="footer" class="dialog-footer">
+                          <el-button @click="handleedit1()">编辑</el-button>
+                          <el-button type="primary" @click="handledelete()"
+                            >删除</el-button
+                          >
+                        </span>
+                      </el-dialog>
+                    </div>
+                  </div>
+                </transition-group>
+              </draggable>
+            </div>
+            <div class="add-joint">
+              <el-button
+                type="info"
+                icon="el-icon-plus"
+                circle
+                size="mini"
+                class="add-button"
+                @click="handlecreatejoint"
+              ></el-button>
+              <span class="add">添加节</span>
+            </div>
           </div>
-          <div class="chapters-chap-num">
-            <p class="chapters-joint">{{ Chapdata[0].joint }}</p>
-            <el-button
-              type="text"
-              class="dot"
-              style=" padding: 0;"
-              @click="dialogVisible = true"
-              >···</el-button
-            >
-            <el-dialog
-              :visible.sync="dialogVisible"
-              :before-close="handleClose"
-            >
-              <span slot="footer" class="dialog-footer">
-                <el-button @click="handleedit1()">编辑</el-button>
-                <el-button type="primary" @click="handledelete()"
-                  >删除</el-button
-                >
-              </span>
-            </el-dialog>
-          </div>
-          <div class="chapters-item-button">
-            <el-button
-              type="info"
-              icon="el-icon-plus"
-              circle
-              size="mini"
-              class="add-button"
-              @click="handlecreatechap"
-            ></el-button>
-            <span class="add">添加节</span>
-          </div>
-        </div>
-        <!-- <div class="chapters-item">
-          <div class="chapters-chap">
-            <i class="el-icon-s-flag"></i>
-            <p class="chapters-num">第二章</p>
-            <div class="dots">···</div>
-          </div>
-          <div class="chapters-chap-num">
-            <p class="chapters-joint">第一节</p>
-            <div class="dot">···</div>
-          </div>
-          <div class="chapters-item-button">
-            <el-button type="info" icon="el-icon-plus" circle size="mini" class="add-button"></el-button>
-            <span class="add">添加节</span>
-          </div>
-        </div> -->
-      </div>
-      <div class="chapters-list list-button">
-        <div class="chapters-item-button">
-          <el-button
-            type="info"
-            icon="el-icon-plus"
-            circle
-            class="add-button"
-            size="mini"
-          ></el-button>
-          <span class="add">添加章</span>
-        </div>
+        </transition-group>
+      </draggable>
+      <div class="add-chapter-button">
+        <span class="button-text">添加章</span>
+        <el-button
+          type="info"
+          icon="el-icon-plus"
+          circle
+          class="chapter-button"
+          size="mini"
+          @click="handleCreatechap"
+        ></el-button>
       </div>
     </div>
   </div>
 </template>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.2/vue.min.js"></script>
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
 <script>
+import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
 // let id = 1000;
 export default {
@@ -169,13 +174,32 @@ export default {
         desc: ""
       },
       formLabelWidth: "120px",
+      hidden: false,
       Chapdata: [
-        {
-          chap: "第一章",
-          joint: "一级"
-        }
+        // { id: 1,
+        //   chap: '第一章',
+        // },
+        // {
+        //   id: 2,
+        //   chap: '第二章'
+        // },
+        // {
+        //   id: 3,
+        //   chap: '第三章',
+        // }
+      ],
+      Jointdata: [
+        // {
+        //   joint: '第一节 ',
+        // },
+        // {
+        //    joint: '第二节 ',
+        // }
       ]
     };
+  },
+  components: {
+    draggable
   },
   created() {},
   methods: {
@@ -221,8 +245,37 @@ export default {
       console.log(123);
       this.dialogFormVisible = false;
     },
-    handlecreatechap() {
+    start: function(evt) {
+      console.log(evt);
+    },
+    end(evt) {
+      console.log(evt);
+    },
+    handleCreatechap() {
+      this.hidden = true;
+      // console.log(this.Chapdata)
+      let chap = this.Chapdata;
+      // console.log(chap)
+      let tmp = chap.push({ id: 1, chap: "第一章" });
+      // console.log(chap[0].id)
+      console.log(chap.length);
+      if (chap.length > 0) {
+        for (let i = 0; i < chap.length; i++) {
+          // console.log(chap[i].id)
+          let code = chap[i].chap.split("")[1];
+          let numbercode = code.replace(new RegExp(code, "g"), i + 1);
+          // console.log(chap[i].chap,code,numbercode)
+          numbercode++;
+          console.log(numbercode);
+          // console.log(chap[i].chap.split('')[1])
+          return chap[i].id++;
+        }
+      }
+      console.log(chap);
+    },
+    handlecreatejoint() {
       console.log(123);
+      let joint = this.Jointdata;
     }
   }
 };
@@ -345,54 +398,44 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.chapters-item {
+.chapter-section {
   border: 2px solid #333;
   margin-bottom: 10px;
 }
-.chapters-chap {
+.chapter-title {
   display: flex;
   flex-direction: row;
-  padding: 10px;
+  height: 30px;
+  line-height: 30px;
   background: #fff;
 }
-.el-icon-s-flag {
-  margin-top: 3px;
-}
-.chapters-num {
+.title {
   flex: 1;
   text-align: left;
-  margin-left: 5px;
 }
-.chapters-chap-num {
+.el-icon-s-flag {
+  margin: 5px 5px 0 5px;
+}
+.joint-title {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding: 5px;
+  height: 30px;
+  line-height: 30px;
+  background: #cccccc;
+  border-bottom: 1px solid #fff;
 }
-.chapters-joint {
-  margin-left: 26px;
+.el-icon-star-on {
+  margin: 5px 5px 0 5px;
 }
-.dots {
-  margin-right: 10px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #000;
-  cursor: pointer;
-}
-.dot {
-  margin-right: 15px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #000;
-  cursor: pointer;
-}
-.chapters-item-button {
+.add-joint {
   display: flex;
   flex-direction: row-reverse;
-
   padding-right: 20px;
   height: 40px;
   background: #fff;
+  line-height: 40px;
+}
+.add {
   line-height: 40px;
 }
 .add-button {
@@ -403,22 +446,36 @@ export default {
   width: 20px;
   height: 20px;
   margin: 10px 0 0 5px;
-  // position: relative;
-  // &:after{
-  //   content: '+';
-  //   display: inline-block;
-  //   margin-left: 5px;
-  //   width: 20px;
-  //   height: 20px;
-  //   line-height: 20px;
-  //   text-align: center;
-  //   border-radius: 50%;
-  //   background: #333;
-  //   color: #fff;
-  // }
 }
-.list-button {
-  margin-top: 0;
+.dots {
+  margin-right: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+}
+.dot {
+  margin-right: 5px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+}
+.add-chapter-button {
+  display: flex;
+  flex-direction: row;
+  place-content: flex-end;
+  height: 48px;
+  line-height: 48px;
   border: 2px solid #333;
+}
+.chapter-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: 14px 20px 0 5px;
 }
 </style>

@@ -9,7 +9,7 @@
         <div class="lesson-name">
           <p class="name">课程名称 :</p>
           <el-input
-            v-model="lessonname"
+            v-model="name"
             placeholder="请输入内容"
             clearable
             style="width: 80%;"
@@ -18,7 +18,7 @@
         <div class="lesson-subtitle">
           <p class="subtitle">副标题 :</p>
           <el-input
-            v-model="lessonsubtitle"
+            v-model="short_name"
             placeholder="请输入内容"
             clearable
             style="width: 80%;"
@@ -27,11 +27,11 @@
       </div>
       <div class="lesson-tips">
         <p class="tips">课程提示 :</p>
-        <el-input v-model="lessontip" placeholder="请输入内容"></el-input>
+        <el-input v-model="tips" placeholder="请输入内容"></el-input>
       </div>
       <div class="lesson-des">
         <p class="des">课程描述 :</p>
-        <el-input v-model="lessondes" placeholder="请输入内容"></el-input>
+        <el-input v-model="des" placeholder="请输入内容"></el-input>
       </div>
       <div class="lesson-avatar">
         <p class="avatars">课程封面 :</p>
@@ -43,7 +43,7 @@
             :http-request="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <img v-if="image_url" :src="image_url" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </div>
@@ -60,14 +60,15 @@
 <script>
 import qiniuService from "@/global/service/qiniu.js";
 import lessonService from "@/global/service/lesson.js";
+
 export default {
   data() {
     return {
-      lessonname: "",
-      lessonsubtitle: "",
-      lessontip: "",
-      lessondes: "",
-      imageUrl: ""
+      name: "",
+      short_name: "",
+      tips: "",
+      des: "",
+      image_url: ""
     };
   },
   created() {},
@@ -76,7 +77,7 @@ export default {
       console.log(123, files);
       qiniuService.upload(files.file).then(res => {
         console.log(res);
-        this.imageUrl = res;
+        this.image_url = res;
       });
     },
     beforeAvatarUpload(file) {
@@ -92,20 +93,20 @@ export default {
       return isJPG && isLt2M;
     },
     handlesubmit() {
-      let name = this.lessonname;
-      let subtitle = this.lessonsubtitle;
-      let status = this.lessontip;
-      let description = this.lessondes;
-      let cover = this.imageUrl;
-      if (!name || !subtitle || !status || !description || !cover) {
+      let name = this.name;
+      let short_name = this.short_name;
+      let tips = this.tips;
+      let description = this.des;
+      let image_url = this.image_url;
+      if (!name || !short_name || !tips || !description || !image_url) {
         return this.$message.error("缺少参数！");
       }
       let params = {
-        name: this.lessonname,
-        subtitle: this.lessonsubtitle,
-        status: this.lessontip,
-        description: this.lessondes,
-        cover: this.imageUrl
+        name: this.name,
+        short_name: this.short_name,
+        tips: this.tips,
+        description: this.des,
+        image_url: this.image_url
       };
       console.log(params);
       lessonService.insert(params).then(res => {
@@ -113,7 +114,7 @@ export default {
         if (res.code === 200) {
           this.$message({
             type: "success",
-            message: "res.message"
+            message: res.message
           });
         }
         this.$router.push({ name: "eduLesson" });
