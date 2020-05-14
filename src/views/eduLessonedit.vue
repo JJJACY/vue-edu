@@ -56,7 +56,11 @@
       </div>
       <draggable v-model="Chapdata" class="chapters-list" v-show="hidden">
         <transition-group>
-          <div v-for="item in Chapdata" :key="item.id" class="chapter-section">
+          <div
+            v-for="(item, index) in Chapdata"
+            :key="index"
+            class="chapter-section"
+          >
             <div class="chapter-title">
               <i class="el-icon-s-flag"></i>
               <div class="title">{{ item.chap }}</div>
@@ -253,29 +257,60 @@ export default {
     },
     handleCreatechap() {
       this.hidden = true;
-      // console.log(this.Chapdata)
-      let chap = this.Chapdata;
-      // console.log(chap)
-      let tmp = chap.push({ id: 1, chap: "第一章" });
-      // console.log(chap[0].id)
-      console.log(chap.length);
-      if (chap.length > 0) {
-        for (let i = 0; i < chap.length; i++) {
-          // console.log(chap[i].id)
-          let code = chap[i].chap.split("")[1];
-          let numbercode = code.replace(new RegExp(code, "g"), i + 1);
-          // console.log(chap[i].chap,code,numbercode)
-          numbercode++;
-          console.log(numbercode);
-          // console.log(chap[i].chap.split('')[1])
-          return chap[i].id++;
+      let tmp = this.Chapdata.push({ id: "1", chap: "第一章" });
+      let code = [];
+
+      if (this.Chapdata.length > 0) {
+        for (let z = 0; z < this.Chapdata.length; z++) {
+          code.push(z);
         }
       }
-      console.log(chap);
+      let chapid = this.Chapdata[code.length - 1].id;
+      let chaps = this.Chapdata[code.length - 1].chap;
+
+      let id = this.NumchangeChina(this.Chapdata.length);
+      console.log(code.length);
+      let newchaps = chaps.replace(/一/, id);
+      this.Chapdata.splice(code.length - 1, 1, {
+        id: code.length,
+        chap: newchaps
+      });
+      console.log(newchaps, this.Chapdata);
     },
     handlecreatejoint() {
       console.log(123);
       let joint = this.Jointdata;
+    },
+    NumchangeChina(num) {
+      let chinarr = new Array(
+        "零",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六",
+        "七",
+        "八",
+        "九"
+      );
+      var arr2 = new Array("", "十", "百", "千");
+      if (!num || isNaN(num)) {
+        return "零";
+      }
+      let english = num.toString().split("");
+      let result = "";
+      for (let x = 0; x < english.length; x++) {
+        let des_x = english.length - 1 - x;
+        result = arr2[x] + result;
+        let arr1_index = english[des_x];
+        result = chinarr[arr1_index] + result;
+      }
+      result = result.replace(/零(千|百|十)/g, "零").replace(/十零/g, "十");
+      result = result.replace(/零+/g, "零");
+      result = result.replace(/零+$/, "");
+      result = result.replace(/^一十/g, "十");
+      return result;
     }
   }
 };
