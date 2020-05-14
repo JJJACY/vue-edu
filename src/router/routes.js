@@ -9,6 +9,13 @@ const eduLessoncreate = () =>
 const eduLessonedit = () =>
   import(/* webpackChunkName: "lessonedit" */ "@/views/eduLessonedit.vue");
 
+const Company = () =>
+  import(/* webpackChunkName: "company" */ "@/views/Company.vue");
+const Companycreate = () =>
+  import(/* webpackChunkName: "companycreate" */ "@/views/Companycreate.vue");
+const Companyedit = () =>
+  import(/* webpackChunkName: "companyedit" */ "@/views/Companyedit.vue");
+
 import BasicLayout from "@/components/BasicLayout.vue";
 
 export default [
@@ -81,6 +88,43 @@ export default [
             meta: {
               breadcrumb: {
                 title: "课程编辑"
+              }
+            }
+          }
+        ]
+      },
+      {
+        path: "/admin/company",
+        name: "companyRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "company" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "企业管理"
+          },
+          breadcrumb: {
+            title: "企业管理"
+          }
+        },
+        children: [
+          {
+            path: "/admin/company",
+            name: "company",
+            component: Company
+          },
+          {
+            path: "/admin/company/create",
+            name: "companycreate",
+            component: Companycreate
+          },
+          {
+            path: "/admin/company/edit",
+            name: "companyedit",
+            component: Companyedit,
+            meta: {
+              breadcrumb: {
+                title: "企业编辑"
               }
             }
           }

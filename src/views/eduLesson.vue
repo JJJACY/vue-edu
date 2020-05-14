@@ -44,7 +44,7 @@
             <span style="margin-left: 10px">{{ scope.row.name }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="名称" width="180">
+        <el-table-column label="副标题" width="180">
           <template slot-scope="scope">
             <span style="margin-left: 10px">{{ scope.row.short_name }}</span>
           </template>
@@ -116,8 +116,10 @@ export default {
     handlecreate() {
       this.$router.push({ name: "eduLessoncreate" });
     },
-    handleEdit() {
-      this.$router.push({ name: "eduLessonedit" });
+    handleEdit(index, row) {
+      let id = row.id;
+      console.log(id);
+      this.$router.push({ name: "eduLessonedit", params: { id } });
     },
     handleDelete(index, row) {
       let id = row.id;

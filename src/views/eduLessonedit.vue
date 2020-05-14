@@ -3,7 +3,7 @@
     <div class="basicinfo">
       <div class="basic-title">
         <p class="text">基本信息</p>
-        <el-button type="primary" @click="handleedit">修改</el-button>
+        <el-button type="primary" @click="handleChapterEdit">修改</el-button>
       </div>
       <el-form ref="form" :model="sizeForm" label-width="80px" size="mini">
         <div class="lesson-info">
@@ -13,16 +13,16 @@
           </div>
           <div class="form-right">
             <div class="form-name">副标题</div>
-            <el-input v-model="sizeForm.subtitle"></el-input>
+            <el-input v-model="sizeForm.short_name"></el-input>
           </div>
         </div>
         <div class="form-item">
           <div class="form-name">课程提示</div>
-          <el-input v-model="sizeForm.tip"></el-input>
+          <el-input v-model="sizeForm.tips"></el-input>
         </div>
         <div class="form-item">
           <div class="form-name">课程描述</div>
-          <el-input v-model="sizeForm.des"></el-input>
+          <el-input v-model="sizeForm.description"></el-input>
         </div>
         <div class="lesson-avatar">
           <div class="lesson-left">
@@ -86,8 +86,8 @@
               <draggable v-model="Jointdata" class="joint-list">
                 <transition-group>
                   <div
-                    v-for="item in Jointdata"
-                    :key="item.id"
+                    v-for="(item, index) in Jointdata"
+                    :key="index"
                     class="joint-section"
                   >
                     <div class="joint-title no-title-line">
@@ -105,8 +105,8 @@
                         :before-close="handleClose"
                       >
                         <span slot="footer" class="dialog-footer">
-                          <el-button @click="handleedit1()">编辑</el-button>
-                          <el-button type="primary" @click="handledelete()"
+                          <el-button @click="handleJointEdit()">编辑</el-button>
+                          <el-button type="primary" @click="handleJointDelete()"
                             >删除</el-button
                           >
                         </span>
@@ -153,15 +153,16 @@
 <script>
 import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
+import lessonService from "@/global/service/lesson.js";
 // let id = 1000;
 export default {
   data() {
     return {
       sizeForm: {
         name: "",
-        subtitle: "",
-        tip: "",
-        des: "",
+        short_name: "",
+        tips: "",
+        description: "",
         status: ""
       },
       imageUrl: "",
@@ -205,10 +206,19 @@ export default {
   components: {
     draggable
   },
-  created() {},
+  created() {
+    this.getData();
+  },
   methods: {
+    getData() {
+      let id = this.$route.params.id;
+      lessonService.single(id).then(res => {
+        if (res.code === 200) {
+          this.sizeForm = res.data;
+        }
+      });
+    },
     handleAvatarSuccess(files) {
-      console.log(123, files);
       qiniuService.upload(files.file).then(res => {
         console.log(res);
         this.imageUrl = res;
@@ -226,28 +236,12 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    handleedit() {
+    handleChapterEdit() {
       console.log(123);
-    },
-    handleedit1() {
-      console.log(444);
-      this.dialogVisible = false;
-    },
-    handledelete() {
-      console.log(123);
-      this.dialogVisible = false;
     },
     handleClose(done) {
       console.log(done);
       this.dialogVisible = false;
-    },
-    handleCancel() {
-      console.log(123);
-      this.dialogFormVisible = false;
-    },
-    handleConfirm() {
-      console.log(123);
-      this.dialogFormVisible = false;
     },
     start: function(evt) {
       console.log(evt);
@@ -255,31 +249,42 @@ export default {
     end(evt) {
       console.log(evt);
     },
+    //章节新增
     handleCreatechap() {
       this.hidden = true;
-      let tmp = this.Chapdata.push({ id: "1", chap: "第一章" });
+      let tmp = this.Chapdata.push({ id: 1, chap: "第一章" });
       let code = [];
-
       if (this.Chapdata.length > 0) {
         for (let z = 0; z < this.Chapdata.length; z++) {
           code.push(z);
         }
       }
-      let chapid = this.Chapdata[code.length - 1].id;
       let chaps = this.Chapdata[code.length - 1].chap;
+      let cpapid = this.NumchangeChina(this.Chapdata.length);
+      let newchaps = chaps.replace(/一/, cpapid);
 
-      let id = this.NumchangeChina(this.Chapdata.length);
-      console.log(code.length);
-      let newchaps = chaps.replace(/一/, id);
+      let course_id = this.$route.params.id;
+      console.log(course_id);
+
       this.Chapdata.splice(code.length - 1, 1, {
         id: code.length,
         chap: newchaps
       });
-      console.log(newchaps, this.Chapdata);
+      console.log(this.Chapdata);
     },
     handlecreatejoint() {
-      console.log(123);
-      let joint = this.Jointdata;
+      let tmp = this.Jointdata.push({ joint: "第一节" });
+      let code = [];
+      if (this.Jointdata.length > 0) {
+        for (let z = 0; z < this.Jointdata.length; z++) {
+          code.push(z);
+        }
+      }
+      let joints = this.Jointdata[code.length - 1].joint;
+      let jointnum = this.NumchangeChina(this.Jointdata.length);
+      let newjoint = joints.replace(/一/, jointnum);
+      this.Jointdata.splice(code.length - 1, 1, { joint: newjoint });
+      console.log(this.Jointdata);
     },
     NumchangeChina(num) {
       let chinarr = new Array(
@@ -311,6 +316,22 @@ export default {
       result = result.replace(/零+$/, "");
       result = result.replace(/^一十/g, "十");
       return result;
+    },
+    handleConfirm() {
+      console.log("确认");
+      this.dialogFormVisible = false;
+    },
+    handleCancel() {
+      console.log("取消");
+      this.dialogFormVisible = false;
+    },
+    handleJointEdit() {
+      console.log(444);
+      this.dialogVisible = false;
+    },
+    handleJointDelete() {
+      console.log(123);
+      this.dialogVisible = false;
     }
   }
 };
