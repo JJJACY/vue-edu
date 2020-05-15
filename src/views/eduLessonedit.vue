@@ -54,7 +54,13 @@
       <div class="basic-title">
         <p class="text">课程章节</p>
       </div>
-      <draggable v-model="Chapdata" class="chapters-list" v-show="hidden">
+      <draggable
+        v-model="Chapdata"
+        class="chapters-list"
+        v-show="hidden"
+        @start="start"
+        @end="end"
+      >
         <transition-group>
           <div
             v-for="(item, index) in Chapdata"
@@ -63,7 +69,7 @@
           >
             <div class="chapter-title">
               <i class="el-icon-s-flag"></i>
-              <div class="title">{{ item.chap }}</div>
+              <div class="title">{{ item.name }}</div>
               <div class="dots" @click="dialogFormVisible = true">···</div>
               <el-dialog title="第一章" :visible.sync="dialogFormVisible">
                 <el-form :model="form">
@@ -154,7 +160,8 @@
 import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
 import lessonService from "@/global/service/lesson.js";
-// let id = 1000;
+import chapterService from "@/global/service/chapter.js";
+
 export default {
   data() {
     return {
@@ -217,6 +224,16 @@ export default {
           this.sizeForm = res.data;
         }
       });
+
+      chapterService.all().then(res => {
+        console.log(res.data);
+        if (res.code === 200) {
+          this.Chapdata = res.data;
+          this.hidden = true;
+        } else {
+          this.hidden = false;
+        }
+      });
     },
     handleAvatarSuccess(files) {
       qiniuService.upload(files.file).then(res => {
@@ -247,7 +264,16 @@ export default {
       console.log(evt);
     },
     end(evt) {
-      console.log(evt);
+      // let id = this.$route.params.id;
+      for (let i = 0; i < this.Chapdata.length; i++) {
+        this.Chapdata[i].sort = i + 1;
+      }
+      let params = this.Chapdata;
+      console.log(params);
+      chapterService.sort({ params }).then(res => {
+        console.log(res);
+      });
+      this.getData;
     },
     //章节新增
     handleCreatechap() {
@@ -260,31 +286,48 @@ export default {
         }
       }
       let chaps = this.Chapdata[code.length - 1].chap;
-      let cpapid = this.NumchangeChina(this.Chapdata.length);
-      let newchaps = chaps.replace(/一/, cpapid);
+      let Chinese = this.NumchangeChina(this.Chapdata.length); //数字转中文
+
+      let name = chaps.replace(/一/, Chinese); //替换数字为中文
 
       let course_id = this.$route.params.id;
-      console.log(course_id);
-
-      this.Chapdata.splice(code.length - 1, 1, {
-        id: code.length,
-        chap: newchaps
+      let sort = code.length;
+      let params = {
+        name: name,
+        course_id: course_id,
+        sort: sort
+      };
+      console.log(params);
+      chapterService.insert(params).then(res => {
+        console.log(res);
+        if (res.code === 200) {
+          this.$message({
+            type: "success",
+            message: res.message
+          });
+        }
+        this.getData();
       });
-      console.log(this.Chapdata);
+
+      // this.Chapdata.splice(code.length - 1, 1, {
+      //   id: code.length,
+      //   name: name
+      // });
     },
     handlecreatejoint() {
-      let tmp = this.Jointdata.push({ joint: "第一节" });
-      let code = [];
-      if (this.Jointdata.length > 0) {
-        for (let z = 0; z < this.Jointdata.length; z++) {
-          code.push(z);
-        }
-      }
-      let joints = this.Jointdata[code.length - 1].joint;
-      let jointnum = this.NumchangeChina(this.Jointdata.length);
-      let newjoint = joints.replace(/一/, jointnum);
-      this.Jointdata.splice(code.length - 1, 1, { joint: newjoint });
-      console.log(this.Jointdata);
+      console.log(123);
+      // let tmp = this.Jointdata.push({ joint: "第一节" });
+      // let code = [];
+      // if (this.Jointdata.length > 0) {
+      //   for (let z = 0; z < this.Jointdata.length; z++) {
+      //     code.push(z);
+      //   }
+      // }
+      // let joints = this.Jointdata[code.length - 1].joint;
+      // let jointnum = this.NumchangeChina(this.Jointdata.length);
+      // let newjoint = joints.replace(/一/, jointnum);
+      // this.Jointdata.splice(code.length - 1, 1, { joint: newjoint });
+      // console.log(this.Jointdata);
     },
     NumchangeChina(num) {
       let chinarr = new Array(
