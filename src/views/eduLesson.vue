@@ -118,7 +118,6 @@ export default {
     },
     handleEdit(index, row) {
       let id = row.id;
-      console.log(id);
       this.$router.push({ name: "eduLessonedit", params: { id } });
     },
     handleDelete(index, row) {

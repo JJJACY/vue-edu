@@ -16,6 +16,17 @@ const Companycreate = () =>
 const Companyedit = () =>
   import(/* webpackChunkName: "companyedit" */ "@/views/Companyedit.vue");
 
+const Stack = () => import(/* webpackChunkName: "stack" */ "@/views/Stack.vue");
+const Stackcreate = () =>
+  import(/* webpackChunkName: "stackcreate" */ "@/views/Stackcreate.vue");
+const Stackedit = () =>
+  import(/* webpackChunkName: "stackedit" */ "@/views/Stackedit.vue");
+
+const Zhiye = () => import(/* webpackChunkName: "zhiye" */ "@/views/Zhiye.vue");
+const Zhiyecreate = () =>
+  import(/* webpackChunkName: "zhiyecreate" */ "@/views/Zhiyecreate.vue");
+const Zhiyeedit = () =>
+  import(/* webpackChunkName: "zhiyeedit" */ "@/views/Zhiyeedit.vue");
 import BasicLayout from "@/components/BasicLayout.vue";
 
 export default [
@@ -94,6 +105,43 @@ export default [
         ]
       },
       {
+        path: "/admin/zhiye",
+        name: "zhiyeRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "zhiye" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "职业路径"
+          },
+          breadcrumb: {
+            title: "职业路径"
+          }
+        },
+        children: [
+          {
+            path: "/admin/zhiye",
+            name: "zhiye",
+            component: Zhiye
+          },
+          {
+            path: "/admin/zhiye/create",
+            name: "zhiyecreate",
+            component: Zhiyecreate
+          },
+          {
+            path: "/admin/zhiye/edit",
+            name: "zhiyeedit",
+            component: Zhiyeedit,
+            meta: {
+              breadcrumb: {
+                title: "职业编辑"
+              }
+            }
+          }
+        ]
+      },
+      {
         path: "/admin/company",
         name: "companyRoot",
         component: { render: h => h("router-view") },
@@ -129,7 +177,86 @@ export default [
             }
           }
         ]
+      },
+      {
+        path: "/admin/stack",
+        name: "stackRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "stack" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "技能管理"
+          },
+          breadcrumb: {
+            title: "技能"
+          }
+        },
+        children: [
+          {
+            path: "/admin/stack",
+            name: "stack",
+            component: Stack
+          },
+          {
+            path: "/admin/stack/create",
+            name: "stackcreate",
+            component: Stackcreate,
+            meta: {
+              breadcrumb: {
+                title: "创建"
+              }
+            }
+          },
+          {
+            path: "/admin/stack/edit",
+            name: "stackedit",
+            component: Stackedit,
+            meta: {
+              breadcrumb: {
+                title: "技能编辑"
+              }
+            }
+          }
+        ]
       }
+      // {
+      //   path: "/admin/skill",
+      //   name: "skillRoot",
+      //   component: { render: h => h("router-view") },
+      //   redirect: { name: "skill" },
+      //   meta: {
+      //     nav: {
+      //       icon: "el-icon-collection-tag",
+      //       title: "题库管理"
+      //     },
+      //     breadcrumb: {
+      //       title: "题库管理"
+      //     }
+      //   },
+      //   children: [
+      //     {
+      //       path: "/admin/skill",
+      //       name: "skill",
+      //       component: Skill
+      //     },
+      //     {
+      //       path: "/admin/skill/create",
+      //       name: "skillcreate",
+      //       component: Skillcreate
+      //     },
+      //     {
+      //       path: "/admin/skill/edit",
+      //       name: "skilledit",
+      //       component: Skilledit,
+      //       meta: {
+      //         breadcrumb: {
+      //           title: "题库编辑"
+      //         }
+      //       }
+      //     }
+      //   ]
+      // },
     ]
   }
 ];

@@ -3,30 +3,20 @@
     <div class="basicinfo">
       <div class="basic-title">
         <p class="text">基本信息</p>
-        <el-button type="primary" @click="handleCourseEdit">修改</el-button>
+        <el-button type="primary" @click="handleZhiyeEdit">修改</el-button>
       </div>
       <el-form ref="form" :model="sizeForm" label-width="80px" size="mini">
-        <div class="lesson-info">
-          <div class="form-left">
-            <div class="form-name">课程名称</div>
-            <el-input v-model="sizeForm.name"></el-input>
-          </div>
-          <div class="form-right">
-            <div class="form-name">副标题</div>
-            <el-input v-model="sizeForm.short_name"></el-input>
-          </div>
+        <div class="form-item">
+          <div class="form-name">职业名称</div>
+          <el-input v-model="sizeForm.name"></el-input>
         </div>
         <div class="form-item">
-          <div class="form-name">课程提示</div>
-          <el-input v-model="sizeForm.tips"></el-input>
-        </div>
-        <div class="form-item">
-          <div class="form-name">课程描述</div>
+          <div class="form-name">职业描述</div>
           <el-input v-model="sizeForm.description"></el-input>
         </div>
         <div class="lesson-avatar">
           <div class="lesson-left">
-            <div class="form-name">课程封面</div>
+            <div class="form-name">职业封面</div>
             <el-upload
               class="avatar-uploader"
               :show-file-list="false"
@@ -39,7 +29,7 @@
             </el-upload>
           </div>
           <div class="lesson-right">
-            <div class="form-name">课程状态</div>
+            <div class="form-name">职业状态</div>
             <el-switch
               v-model="sizeForm.status"
               active-color="#13ce66"
@@ -52,20 +42,19 @@
     </div>
     <div class="chapters">
       <div class="basic-title">
-        <p class="text">课程章节</p>
+        <p class="text">职业路径</p>
       </div>
       <draggable
-        v-model="Chapdata"
+        v-model="zhiyeData"
         class="chapters-list"
-        v-show="hidden"
         @start="start"
         @end="end"
       >
         <transition-group>
           <div
-            v-for="(item, index) in Chapdata"
+            class="zhiyelist"
+            v-for="(item, index) in zhiyeData"
             :key="index"
-            class="chapter-section"
           >
             <div class="chapter-title">
               <i class="el-icon-s-flag"></i>
@@ -74,25 +63,87 @@
                 <span class="dots el-dropdown-link">···</span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <div @click="ChapterEdit(item.id)">编辑</div>
+                    <el-button type="text" @click="PathEdit(item.id)"
+                      >编辑</el-button
+                    >
                   </el-dropdown-item>
+                  <div class="drop-list">
+                    <el-dialog
+                      title="修改职业路径"
+                      :visible.sync="dialogFormVisible"
+                    >
+                      <el-form :model="form">
+                        <el-form-item
+                          label="路径名称"
+                          :label-width="formLabelWidth"
+                        >
+                          <el-input
+                            v-model="form.name"
+                            autocomplete="off"
+                          ></el-input>
+                        </el-form-item>
+                        <el-form-item
+                          label="路径描述"
+                          :label-width="formLabelWidth"
+                        >
+                          <el-input
+                            v-model="form.description"
+                            autocomplete="off"
+                          ></el-input>
+                        </el-form-item>
+                      </el-form>
+                      <div slot="footer" class="dialog-footer">
+                        <el-button @click="pathCancel">取 消</el-button>
+                        <el-button type="primary" @click="pathConfirm"
+                          >确 定</el-button
+                        >
+                      </div>
+                    </el-dialog>
+                  </div>
                   <el-dropdown-item>
                     <div @click="ChapterDelete(item.id, index)">删除</div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
+              <div class="drop-list">
+                <el-dialog
+                  title="修改职业路径"
+                  :visible.sync="dialogFormVisible"
+                >
+                  <el-form :model="form">
+                    <el-form-item
+                      label="路径名称"
+                      :label-width="formLabelWidth"
+                    >
+                      <el-input
+                        v-model="form.name"
+                        autocomplete="off"
+                      ></el-input>
+                    </el-form-item>
+                    <el-form-item
+                      label="路径描述"
+                      :label-width="formLabelWidth"
+                    >
+                      <el-input
+                        v-model="form.description"
+                        autocomplete="off"
+                      ></el-input>
+                    </el-form-item>
+                  </el-form>
+                  <div slot="footer" class="dialog-footer">
+                    <el-button @click="pathCancel">取 消</el-button>
+                    <el-button type="primary" @click="pathConfirm"
+                      >确 定</el-button
+                    >
+                  </div>
+                </el-dialog>
+              </div>
             </div>
             <div class="joint-list">
-              <draggable
-                v-model="item.sectionAll"
-                v-show="hidden"
-                group="people"
-                @start="sectionstart"
-                @end="sectionend"
-              >
-                <transition-group class="dragspan">
+              <draggable v-model="Jointdata[index]" class="joint-list">
+                <transition-group>
                   <div
-                    v-for="(item, index) in item.sectionAll"
+                    v-for="(item, index) in Jointdata[index]"
                     :key="index"
                     class="joint-section"
                   >
@@ -106,9 +157,7 @@
                             <div @click="JointContent(item.id)">内容</div>
                           </el-dropdown-item>
                           <el-dropdown-item>
-                            <div @click="JointEdit(item.sectionAll.id)">
-                              编辑
-                            </div>
+                            <div @click="JointEdit(item.id)">编辑</div>
                           </el-dropdown-item>
                           <el-dropdown-item>
                             <div @click="JointDelete(item.id, index)">删除</div>
@@ -127,22 +176,22 @@
                 circle
                 size="mini"
                 class="add-button"
-                @click="handlecreatejoint(index)"
+                @click="handleCreateclass(index)"
               ></el-button>
-              <span class="add">添加节</span>
+              <span class="add">添加关联课程</span>
             </div>
           </div>
         </transition-group>
       </draggable>
       <div class="add-chapter-button">
-        <span class="button-text">添加章</span>
+        <span class="button-text">添加路径</span>
         <el-button
           type="info"
           icon="el-icon-plus"
           circle
           class="chapter-button"
           size="mini"
-          @click="handleCreatechap()"
+          @click="handleCreatepath"
         ></el-button>
       </div>
     </div>
@@ -157,31 +206,32 @@
 <script>
 import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
-import lessonService from "@/global/service/lesson.js";
-import chapterService from "@/global/service/chapter.js";
-import sectionService from "@/global/service/section.js";
+
 // import {formatTime} from "@/utils/formatDate.js"
+import zhiyeService from "@/global/service/zhiye.js";
 
 export default {
   data() {
     return {
       sizeForm: {
         name: "",
-        short_name: "",
-        tips: "",
         description: "",
         status: ""
       },
       imageUrl: "",
-      dialogVisible: false,
+      zhiyeData: [
+        { name: "初级工程师" },
+        { name: "中级工程师" },
+        { name: "高级工程师" }
+      ],
+      Jointdata: [],
       dialogFormVisible: false,
       form: {
-        name: ""
+        name: "",
+        description: ""
       },
       formLabelWidth: "120px",
-      hidden: false,
-      Chapdata: [],
-      sectionAll: []
+      hidden: false
     };
   },
   components: {
@@ -193,40 +243,11 @@ export default {
   methods: {
     getData() {
       let id = this.$route.params.id;
-      lessonService.index(id).then(res => {
-        if (res.code === 200) {
-          this.hidden = true;
-          this.Chapdata = res.data;
-        }
+      console.log(id);
+      zhiyeService.single(id).then(res => {
+        console.log(res);
+        this.sizeForm = res.data;
       });
-
-      lessonService.single(id).then(res => {
-        if (res.code === 200) {
-          this.sizeForm = res.data;
-        }
-      });
-
-      // chapterService.single(id).then(res => {
-      //   if (res.code === 200) {
-      //     this.Chapdata = res.data;
-      //     this.hidden = true;
-      //   } else {
-      //     this.hidden = false;
-      //   }
-      // });
-
-      // chapterService.single(id).then(res => {
-      //     res.data.forEach( arr =>{
-      //       sectionService.single(arr.id).then(res=>{
-      //         console.log(res.data)
-      //         if(res.code === 200){
-      //           this.hidden = true;
-      //           this.Jointdata.push(res.data)
-      //           console.log(this.Jointdata)
-      //         }
-      //       })
-      //     })
-      // });
     },
     handleAvatarSuccess(files) {
       qiniuService.upload(files.file).then(res => {
@@ -246,173 +267,81 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    handleCourseEdit() {
+    handleZhiyeEdit() {
       console.log(123);
     },
     start: function(evt) {
       console.log(evt);
     },
     end(evt) {
-      console.log(evt);
-      let params = this.Chapdata;
-      params.map((arr, index) => {
-        arr.sort = index + 1;
-        arr.sectionAll.map((data, index) => {
-          data.chapter_id = arr.id;
-          data.sort = index + 1;
-        });
-      });
-      chapterService.sort({ params }).then(res => {
-        console.log(res);
-      });
-    },
-    sectionstart(evt) {
-      console.log(evt);
-    },
-    sectionend(evt) {
-      let params = this.Chapdata;
-      params.map((arr, index) => {
-        arr.sort = index;
-        arr.sectionAll.map((data, index) => {
-          data.chapter_id = arr.id;
-          data.sort = index;
-        });
-      });
-      chapterService.sort({ params }).then(res => {
-        console.log(res);
-      });
+      console.log(123);
     },
     //章节新增
-    handleCreatechap() {
-      let course_id = this.$route.params.id;
-      this.$prompt("请输入章的名称", "提示", {
+    handleCreatepath() {
+      console.log(123);
+    },
+    handleCreateclass(index) {
+      this.$prompt("请输入课程ID", "关联课程", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(({ value }) => {
-          let name = value;
-          let created_at = new Date();
-          console.log(this.Chapdata);
-          let sort = this.Chapdata.length - 1;
-          let params = {
-            course_id: course_id,
-            name: name,
-            sort: sort,
-            created_at: created_at
-          };
-          chapterService.insert(params).then(res => {
-            if (res.code === 200) {
-              this.$message({
-                type: "success",
-                message: "新增成功"
-              });
-            }
-          });
-          this.getData();
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入"
-          });
-        });
-    },
-    handlecreatejoint(index) {
-      this.$prompt("请输入节的名称", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(({ value }) => {
-          let chapter_id = this.Chapdata[index].id;
-          let name = value;
-          let created_at = new Date();
-          let sort = this.Chapdata[index].sectionAll.length;
-          let params = {
-            chapter_id: chapter_id,
-            name: name,
-            created_at: created_at,
-            sort: sort
-          };
-          sectionService.insert(params).then(res => {
-            if (res.code === 200) {
-              this.$message({
-                type: "success",
-                message: "新增成功"
-              });
-            }
-          });
-          this.getData();
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入"
-          });
-        });
-    },
-    ChapterEdit(id) {
-      this.$prompt("请输入章的名称", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      }).then(({ value }) => {
-        let name = value;
-        if (!name) {
-          this.$message({
-            type: "warning",
-            message: "请输入章名！"
-          });
-        }
-        let params = {
-          name: name
-        };
-        chapterService.update(id, params).then(res => {
           this.$message({
             type: "success",
-            message: res.message
+            message: "你的ID是: " + value
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入"
           });
         });
-        this.getData();
-      });
     },
-    ChapterDelete(id, index) {
-      if (this.Chapdata[index].sectionAll.length > 0) {
-        this.$message({
-          type: "warning",
-          message: "请先删除章中小节"
-        });
-      } else {
-        this.$confirm("此操作将永久删除该章, 是否继续?", "提示", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }).then(() => {
-          chapterService.delete(id).then(res => {
-            if (res.code === 200) {
-              this.$message({
-                type: "success",
-                message: res.message
-              });
-            }
-          });
-          this.getData();
-        });
+    NumchangeChina(num) {
+      let chinarr = new Array(
+        "零",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六",
+        "七",
+        "八",
+        "九"
+      );
+      var arr2 = new Array("", "十", "百", "千");
+      if (!num || isNaN(num)) {
+        return "零";
       }
-      // this.$confirm("此操作将永久删除该章, 是否继续?", "提示", {
-      //   confirmButtonText: "确定",
-      //   cancelButtonText: "取消",
-      //   type: "warning"
-      // }).then(() => {
+      let english = num.toString().split("");
+      let result = "";
+      for (let x = 0; x < english.length; x++) {
+        let des_x = english.length - 1 - x;
+        result = arr2[x] + result;
+        let arr1_index = english[des_x];
+        result = chinarr[arr1_index] + result;
+      }
+      result = result.replace(/零(千|百|十)/g, "零").replace(/十零/g, "十");
+      result = result.replace(/零+/g, "零");
+      result = result.replace(/零+$/, "");
+      result = result.replace(/^一十/g, "十");
+      return result;
+    },
 
-      //   chpaterService.delete(id).then(res => {
-      //     if (res.code === 200) {
-      //       this.$message({
-      //         type: "success",
-      //         message: res.message
-      //       });
-      //     }
-      //   });
-      //   this.getData();
-      // });
+    PathEdit() {
+      this.dialogFormVisible = true;
+    },
+    pathCancel() {
+      this.dialogFormVisible = false;
+    },
+    pathConfirm() {
+      this.dialogFormVisible = false;
+    },
+
+    ChapterDelete(index, id) {
+      console.log(id, index);
     },
     JointContent() {
       console.log("内容");
@@ -420,23 +349,8 @@ export default {
     JointEdit() {
       console.log(444);
     },
-    JointDelete(id, index) {
-      console.log(id, index);
-      this.$confirm("此操作将永久删除该节, 是否继续?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      }).then(() => {
-        sectionService.delete(id).then(res => {
-          if (res.code === 200) {
-            this.$message({
-              type: "success",
-              message: res.message
-            });
-          }
-        });
-        this.getData();
-      });
+    JointDelete() {
+      console.log(123);
     }
   }
 };
@@ -559,12 +473,14 @@ export default {
   display: flex;
   flex-direction: column;
 }
-.chapter-section {
-  display: flex;
-  flex-direction: column;
-  border: 2px solid #333;
-  margin-bottom: 10px;
+.zhiyelist {
+  border: 2px solid #fcfcfc;
+  margin-bottom: 20px;
 }
+// .chapter-section {
+//   border: 2px solid #333;
+//   margin-bottom: 10px;
+// }
 .chapter-title {
   display: flex;
   flex-direction: row;
@@ -575,17 +491,9 @@ export default {
 .title {
   flex: 1;
   text-align: left;
-  width: 100%;
 }
 .el-icon-s-flag {
   margin: 5px 5px 0 5px;
-}
-.joint-list {
-  flex: 1;
-}
-.dragspan {
-  display: block;
-  width: 100%;
 }
 .joint-title {
   display: flex;

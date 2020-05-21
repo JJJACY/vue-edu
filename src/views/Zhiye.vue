@@ -1,11 +1,11 @@
 <template>
   <div class="lesson-container">
     <el-button class="create-lesson" type="success" @click="handlecreate()"
-      >创建企业</el-button
+      >创建职业</el-button
     >
     <div class="clearboth"></div>
     <template>
-      <el-table :data="companyData" style="width: 100%">
+      <el-table :data="zhiyeData" style="width: 100%">
         <el-table-column label="ID" width="180">
           <template slot-scope="scope">
             <span style="margin-left: 10px">{{ scope.row.id }}</span>
@@ -14,6 +14,13 @@
         <el-table-column label="名称" width="180">
           <template slot-scope="scope">
             <span style="margin-left: 10px">{{ scope.row.name }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" width="180">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">
+              <el-tag size="medium">{{ scope.row.status }}</el-tag>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="操作">
@@ -35,12 +42,12 @@
 </template>
 
 <script>
-import companyService from "@/global/service/company.js";
+import zhiyeService from "@/global/service/zhiye.js";
 export default {
   data() {
     return {
-      companyData: [],
-      currentRow: null
+      zhiyeData: []
+      // currentRow: null
     };
   },
   created() {
@@ -48,8 +55,25 @@ export default {
   },
   methods: {
     getData() {
-      companyService.all().then(res => {
-        this.companyData = res.data;
+      zhiyeService.all().then(res => {
+        console.log(res);
+        if (res.code === 200) {
+          if (res.data) {
+            res.data.forEach(arr => {
+              switch (arr.status) {
+                case 0:
+                  arr.status = "未完成";
+                  break;
+                case 1:
+                  arr.status = "已完成";
+                  break;
+                default:
+                  arr.status = "状态错误";
+              }
+              this.zhiyeData = res.data;
+            });
+          }
+        }
       });
     },
     handleCurrentChange(val) {
@@ -58,12 +82,11 @@ export default {
       console.log(id);
     },
     handlecreate() {
-      this.$router.push({ name: "companycreate" });
+      this.$router.push({ name: "zhiyecreate" });
     },
     handleEdit(index, row) {
       let id = row.id;
-      console.log(id);
-      this.$router.push({ name: "companyedit", params: { id } });
+      this.$router.push({ name: "zhiyeedit", params: { id } });
     },
     handleDelete(index, row) {
       let id = row.id;
@@ -73,15 +96,15 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        companyService.delete(id).then(res => {
-          if (res.code === 200) {
-            this.$message({
-              type: "success",
-              message: res.message
-            });
-          }
-        });
-        this.companyData.splice(index, 1);
+        // lessonService.delete(id).then(res => {
+        //   if (res.code === 200) {
+        //     this.$message({
+        //       type: "success",
+        //       message: res.message
+        //     });
+        //   }
+        // });
+        this.lessonData.splice(index, 1);
         this.getData();
       });
     }
