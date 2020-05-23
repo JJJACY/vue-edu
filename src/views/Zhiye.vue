@@ -47,7 +47,6 @@ export default {
   data() {
     return {
       zhiyeData: []
-      // currentRow: null
     };
   },
   created() {
@@ -96,14 +95,14 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       }).then(() => {
-        // lessonService.delete(id).then(res => {
-        //   if (res.code === 200) {
-        //     this.$message({
-        //       type: "success",
-        //       message: res.message
-        //     });
-        //   }
-        // });
+        zhiyeService.delete(id).then(res => {
+          if (res.code === 200) {
+            this.$message({
+              type: "success",
+              message: res.message
+            });
+          }
+        });
         this.lessonData.splice(index, 1);
         this.getData();
       });

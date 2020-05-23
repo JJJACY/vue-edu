@@ -87,8 +87,8 @@
                 v-model="item.sectionAll"
                 v-show="hidden"
                 group="people"
-                @start="sectionstart"
-                @end="sectionend"
+                @start="start"
+                @end="end"
               >
                 <transition-group class="dragspan">
                   <div
@@ -106,7 +106,7 @@
                             <div @click="JointContent(item.id)">内容</div>
                           </el-dropdown-item>
                           <el-dropdown-item>
-                            <div @click="JointEdit(item.sectionAll.id)">
+                            <div @click="JointEdit(item.id)">
                               编辑
                             </div>
                           </el-dropdown-item>
@@ -115,6 +115,48 @@
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
+                      <div class="chouti">
+                        <el-drawer
+                          size="540px"
+                          :visible.sync="drawer"
+                          :direction="direction"
+                          :before-close="handleClose"
+                        >
+                          <div class="main-drawer">
+                            <p class="drawer-joint-title">小节名称</p>
+                            <p class="drawer-joint-name">{{ secname }}</p>
+                            <el-form label-position="left" label-width="80px">
+                              <el-form-item
+                                label="视频地址"
+                                class="form-video_url"
+                              >
+                                <el-input
+                                  v-model="video_url"
+                                  size="300px"
+                                ></el-input>
+                              </el-form-item>
+                            </el-form>
+                            <p class="quill-task">课任务内容</p>
+                            <div class="quill">
+                              <quill-editor
+                                class="quill-editor"
+                                v-model="article.content"
+                                ref="myQuillEditor"
+                                :options="editorOption"
+                              >
+                              </quill-editor>
+                            </div>
+                          </div>
+                          <div class="keep-btn">
+                            <el-button
+                              type="primary"
+                              class="storysubmit"
+                              @click="keepJoint"
+                              >保存</el-button
+                            >
+                          </div>
+                        </el-drawer>
+                      </div>
                     </div>
                   </div>
                 </transition-group>
@@ -155,6 +197,28 @@
 <!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
 <script>
+import "quill/dist/quill.core.css";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
+import { quillEditor } from "vue-quill-editor";
+
+const toolbarOptions = [
+  ["bold", "italic", "underline", "strike"],
+  ["blockquote", "code-block"],
+  [{ header: 1 }, { header: 2 }],
+  [{ list: "ordered" }, { list: "bullet" }],
+  [{ script: "sub" }, { script: "super" }],
+  [{ indent: "-1" }, { indent: "+1" }],
+  [{ direction: "rtl" }],
+  [{ size: ["small", false, "large", "huge"] }],
+  [{ header: [1, 2, 3, 4, 5, 6, false] }],
+  [{ color: [] }, { background: [] }],
+  [{ font: [] }],
+  [{ align: [] }],
+  ["clean"],
+  ["link"]
+];
+
 import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
 import lessonService from "@/global/service/lesson.js";
@@ -165,6 +229,21 @@ import sectionService from "@/global/service/section.js";
 export default {
   data() {
     return {
+      drawer: false,
+      direction: "rtl",
+      secname: "",
+      section_id: null,
+      video_url: "",
+      article: {
+        content: ""
+      },
+      editorOption: {
+        modules: {
+          toolbar: {
+            container: toolbarOptions
+          }
+        }
+      },
       sizeForm: {
         name: "",
         short_name: "",
@@ -185,7 +264,8 @@ export default {
     };
   },
   components: {
-    draggable
+    draggable,
+    "quill-editor": quillEditor
   },
   created() {
     this.getData();
@@ -205,28 +285,6 @@ export default {
           this.sizeForm = res.data;
         }
       });
-
-      // chapterService.single(id).then(res => {
-      //   if (res.code === 200) {
-      //     this.Chapdata = res.data;
-      //     this.hidden = true;
-      //   } else {
-      //     this.hidden = false;
-      //   }
-      // });
-
-      // chapterService.single(id).then(res => {
-      //     res.data.forEach( arr =>{
-      //       sectionService.single(arr.id).then(res=>{
-      //         console.log(res.data)
-      //         if(res.code === 200){
-      //           this.hidden = true;
-      //           this.Jointdata.push(res.data)
-      //           console.log(this.Jointdata)
-      //         }
-      //       })
-      //     })
-      // });
     },
     handleAvatarSuccess(files) {
       qiniuService.upload(files.file).then(res => {
@@ -254,22 +312,6 @@ export default {
     },
     end(evt) {
       console.log(evt);
-      let params = this.Chapdata;
-      params.map((arr, index) => {
-        arr.sort = index + 1;
-        arr.sectionAll.map((data, index) => {
-          data.chapter_id = arr.id;
-          data.sort = index + 1;
-        });
-      });
-      chapterService.sort({ params }).then(res => {
-        console.log(res);
-      });
-    },
-    sectionstart(evt) {
-      console.log(evt);
-    },
-    sectionend(evt) {
       let params = this.Chapdata;
       params.map((arr, index) => {
         arr.sort = index;
@@ -414,14 +456,60 @@ export default {
       //   this.getData();
       // });
     },
-    JointContent() {
-      console.log("内容");
+    JointContent(id) {
+      this.drawer = true;
+      sectionService.single(id).then(res => {
+        console.log(res);
+        if (res.code === 200) {
+          this.secname = res.data.name;
+          this.section_id = res.data.id;
+        }
+      });
     },
-    JointEdit() {
-      console.log(444);
+    keepJoint() {
+      let id = this.section_id;
+      let video_url = this.video_url;
+      let content = this.article.content;
+      let updated_at = new Date();
+      let params = {
+        video_url: video_url,
+        content: content,
+        updated_at: updated_at
+      };
+      sectionService.update(id, params).then(res => {
+        if (res.code === 200) {
+          this.$message({
+            type: "success",
+            message: res.message
+          });
+        }
+      });
+    },
+    JointEdit(id) {
+      this.$prompt("请输入节的名称", "编辑", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      }).then(({ value }) => {
+        let name = value;
+        if (!name) {
+          this.$message({
+            type: "warning",
+            message: "请输入节名！"
+          });
+        }
+        let params = {
+          name: name
+        };
+        sectionService.updatename(id, params).then(res => {
+          this.$message({
+            type: "success",
+            message: res.message
+          });
+        });
+        this.getData();
+      });
     },
     JointDelete(id, index) {
-      console.log(id, index);
       this.$confirm("此操作将永久删除该节, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -437,6 +525,13 @@ export default {
         });
         this.getData();
       });
+    },
+    handleClose(done) {
+      this.$confirm("确认关闭？")
+        .then(_ => {
+          done();
+        })
+        .catch(_ => {});
     }
   }
 };
@@ -648,5 +743,48 @@ export default {
   width: 20px;
   height: 20px;
   margin: 14px 20px 0 5px;
+}
+
+//抽屉
+.quill {
+  width: 85%;
+  margin: 0 auto;
+}
+.quill {
+  height: 400px;
+}
+.quill-task {
+  text-align: left;
+  margin-bottom: 10px;
+  padding-left: 40px;
+}
+.quill-editor {
+  height: 300px;
+}
+.ql-editor .ql-blank {
+  height: 300px;
+}
+.drawer-joint-title {
+  text-align: left;
+  padding: 0 40px;
+  margin: 20px 0;
+  font-size: 16px;
+}
+.drawer-joint-name {
+  text-align: left;
+  padding: 0 40px;
+  margin: 20px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+.form-video_url {
+  padding: 0 40px;
+}
+.keep-btn {
+  margin-top: 40px;
+  padding: 0 40px;
+}
+.storysubmit {
+  float: left;
 }
 </style>

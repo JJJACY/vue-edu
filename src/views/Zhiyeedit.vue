@@ -63,45 +63,10 @@
                 <span class="dots el-dropdown-link">···</span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <el-button type="text" @click="PathEdit(item.id)"
-                      >编辑</el-button
-                    >
+                    <el-button type="text" @click="PathEdit()">编辑</el-button>
                   </el-dropdown-item>
-                  <div class="drop-list">
-                    <el-dialog
-                      title="修改职业路径"
-                      :visible.sync="dialogFormVisible"
-                    >
-                      <el-form :model="form">
-                        <el-form-item
-                          label="路径名称"
-                          :label-width="formLabelWidth"
-                        >
-                          <el-input
-                            v-model="form.name"
-                            autocomplete="off"
-                          ></el-input>
-                        </el-form-item>
-                        <el-form-item
-                          label="路径描述"
-                          :label-width="formLabelWidth"
-                        >
-                          <el-input
-                            v-model="form.description"
-                            autocomplete="off"
-                          ></el-input>
-                        </el-form-item>
-                      </el-form>
-                      <div slot="footer" class="dialog-footer">
-                        <el-button @click="pathCancel">取 消</el-button>
-                        <el-button type="primary" @click="pathConfirm"
-                          >确 定</el-button
-                        >
-                      </div>
-                    </el-dialog>
-                  </div>
                   <el-dropdown-item>
-                    <div @click="ChapterDelete(item.id, index)">删除</div>
+                    <div @click="PathDelete(item.id, index)">删除</div>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
@@ -132,7 +97,7 @@
                   </el-form>
                   <div slot="footer" class="dialog-footer">
                     <el-button @click="pathCancel">取 消</el-button>
-                    <el-button type="primary" @click="pathConfirm"
+                    <el-button type="primary" @click="pathConfirm(item.id)"
                       >确 定</el-button
                     >
                   </div>
@@ -140,27 +105,35 @@
               </div>
             </div>
             <div class="joint-list">
-              <draggable v-model="Jointdata[index]" class="joint-list">
-                <transition-group>
+              <draggable
+                v-model="item.courseAll"
+                class="joint-list"
+                group="people"
+                @start="start"
+                @end="end"
+              >
+                <transition-group class="dragspan">
                   <div
-                    v-for="(item, index) in Jointdata[index]"
+                    v-for="(item, index) in item.courseAll"
                     :key="index"
                     class="joint-section"
                   >
                     <div class="joint-title no-title-line">
                       <i class="el-icon-star-on"></i>
-                      <div class="title">{{ item.name }}</div>
+                      <div class="title">{{ item.course_id }}</div>
                       <el-dropdown trigger="click">
                         <span class="dots el-dropdown-link">···</span>
                         <el-dropdown-menu slot="dropdown">
-                          <el-dropdown-item>
-                            <div @click="JointContent(item.id)">内容</div>
+                          <!-- <el-dropdown-item>
+                            <div @click="CourseContent(item.id)">内容</div>
                           </el-dropdown-item>
                           <el-dropdown-item>
-                            <div @click="JointEdit(item.id)">编辑</div>
-                          </el-dropdown-item>
+                            <div @click="CourseEdit(item.id)">编辑</div>
+                          </el-dropdown-item> -->
                           <el-dropdown-item>
-                            <div @click="JointDelete(item.id, index)">删除</div>
+                            <div @click="CourseDelete(item.id, index)">
+                              删除
+                            </div>
                           </el-dropdown-item>
                         </el-dropdown-menu>
                       </el-dropdown>
@@ -207,8 +180,9 @@
 import draggable from "vuedraggable";
 import qiniuService from "@/global/service/qiniu.js";
 
-// import {formatTime} from "@/utils/formatDate.js"
 import zhiyeService from "@/global/service/zhiye.js";
+import zhiyepathService from "@/global/service/zhiyepath.js";
+import zhiyecourseService from "@/global/service/zhiyecourse.js";
 
 export default {
   data() {
@@ -219,11 +193,7 @@ export default {
         status: ""
       },
       imageUrl: "",
-      zhiyeData: [
-        { name: "初级工程师" },
-        { name: "中级工程师" },
-        { name: "高级工程师" }
-      ],
+      zhiyeData: [],
       Jointdata: [],
       dialogFormVisible: false,
       form: {
@@ -243,10 +213,14 @@ export default {
   methods: {
     getData() {
       let id = this.$route.params.id;
-      console.log(id);
       zhiyeService.single(id).then(res => {
-        console.log(res);
         this.sizeForm = res.data;
+      });
+
+      zhiyeService.index(id).then(res => {
+        if (res.code === 200) {
+          this.zhiyeData = res.data;
+        }
       });
     },
     handleAvatarSuccess(files) {
@@ -274,22 +248,45 @@ export default {
       console.log(evt);
     },
     end(evt) {
-      console.log(123);
+      let params = this.zhiyeData;
+      params.map((arr, index) => {
+        arr.sort = index;
+        arr.courseAll.map((data, index) => {
+          data.zhiye_id = arr.id;
+          data.sort = index;
+        });
+      });
+      zhiyepathService.sort({ params }).then(res => {
+        console.log(res);
+      });
     },
-    //章节新增
+    //路径新增
     handleCreatepath() {
-      console.log(123);
-    },
-    handleCreateclass(index) {
-      this.$prompt("请输入课程ID", "关联课程", {
+      let zhiye_id = this.$route.params.id;
+      this.$prompt("请输入路径名称", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(({ value }) => {
-          this.$message({
-            type: "success",
-            message: "你的ID是: " + value
+          let name = value;
+          let created_at = new Date();
+          let sort = this.zhiyeData.length;
+          let params = {
+            zhiye_id: zhiye_id,
+            name: name,
+            sort: sort,
+            created_at: created_at
+          };
+          console.log(params);
+          zhiyepathService.insert(params).then(res => {
+            if (res.code === 200) {
+              this.$message({
+                type: "success",
+                message: "新增成功"
+              });
+            }
           });
+          this.getData();
         })
         .catch(() => {
           this.$message({
@@ -298,36 +295,38 @@ export default {
           });
         });
     },
-    NumchangeChina(num) {
-      let chinarr = new Array(
-        "零",
-        "一",
-        "二",
-        "三",
-        "四",
-        "五",
-        "六",
-        "七",
-        "八",
-        "九"
-      );
-      var arr2 = new Array("", "十", "百", "千");
-      if (!num || isNaN(num)) {
-        return "零";
-      }
-      let english = num.toString().split("");
-      let result = "";
-      for (let x = 0; x < english.length; x++) {
-        let des_x = english.length - 1 - x;
-        result = arr2[x] + result;
-        let arr1_index = english[des_x];
-        result = chinarr[arr1_index] + result;
-      }
-      result = result.replace(/零(千|百|十)/g, "零").replace(/十零/g, "十");
-      result = result.replace(/零+/g, "零");
-      result = result.replace(/零+$/, "");
-      result = result.replace(/^一十/g, "十");
-      return result;
+    handleCreateclass(index) {
+      let zhiye_id = this.$route.params.id;
+      let path_id = this.zhiyeData[index].id;
+      this.$prompt("请输入课程ID", "关联课程", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(({ value }) => {
+          let course_id = value;
+          let sort = this.zhiyeData[index].courseAll.length;
+          let params = {
+            zhiye_id: zhiye_id,
+            path_id: path_id,
+            course_id: course_id,
+            sort: sort
+          };
+          zhiyecourseService.insert(params).then(res => {
+            if (res.code === 200) {
+              this.$message({
+                type: "success",
+                message: res.message
+              });
+            }
+          });
+          this.getData();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入"
+          });
+        });
     },
 
     PathEdit() {
@@ -336,21 +335,74 @@ export default {
     pathCancel() {
       this.dialogFormVisible = false;
     },
-    pathConfirm() {
+    pathConfirm(id) {
       this.dialogFormVisible = false;
+      let name = this.form.name;
+      let description = this.form.description;
+      if (!name || !description) {
+        this.$message({
+          type: "warning",
+          message: "缺少参数"
+        });
+      }
+      let params = {
+        name: name,
+        description: description
+      };
+      zhiyepathService.update(id, params).then(res => {
+        console.log(res);
+        if (res.code === 200) {
+          this.$message({
+            type: "success",
+            message: res.message
+          });
+        }
+      });
+      this.getData();
     },
 
-    ChapterDelete(index, id) {
+    PathDelete(id, index) {
+      if (this.zhiyeData[index].courseAll.length > 0) {
+        this.$message({
+          type: "warning",
+          message: "请先删除职业路径中的课程"
+        });
+      } else {
+        this.$confirm("此操作将永久删除该路径, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          zhiyepathService.delete(id).then(res => {
+            if (res.code === 200) {
+              this.$message({
+                type: "success",
+                message: res.message
+              });
+            }
+          });
+          this.getData();
+        });
+      }
+    },
+
+    CourseDelete(id, index) {
       console.log(id, index);
-    },
-    JointContent() {
-      console.log("内容");
-    },
-    JointEdit() {
-      console.log(444);
-    },
-    JointDelete() {
-      console.log(123);
+      this.$confirm("此操作将永久删除该课程, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        zhiyecourseService.delete(id).then(res => {
+          if (res.code === 200) {
+            this.$message({
+              type: "success",
+              message: res.message
+            });
+          }
+        });
+        this.getData();
+      });
     }
   }
 };
@@ -472,6 +524,10 @@ export default {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
+}
+.dragspan {
+  display: block;
+  width: 100%;
 }
 .zhiyelist {
   border: 2px solid #fcfcfc;

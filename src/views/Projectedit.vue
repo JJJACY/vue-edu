@@ -5,36 +5,16 @@
     </div>
     <div class="clear"></div>
     <div class="body">
-      <div class="lesson">
-        <div class="lesson-name">
-          <p class="name">课程名称 :</p>
-          <el-input
-            v-model="name"
-            placeholder="请输入内容"
-            clearable
-            style="width: 80%;"
-          ></el-input>
-        </div>
-        <div class="lesson-subtitle">
-          <p class="subtitle">副标题 :</p>
-          <el-input
-            v-model="short_name"
-            placeholder="请输入内容"
-            clearable
-            style="width: 80%;"
-          ></el-input>
-        </div>
+      <div class="lesson-tips">
+        <p class="tips">项目名称 :</p>
+        <el-input v-model="name" placeholder="请输入内容"></el-input>
       </div>
       <div class="lesson-tips">
-        <p class="tips">课程提示 :</p>
-        <el-input v-model="tips" placeholder="请输入内容"></el-input>
-      </div>
-      <div class="lesson-des">
-        <p class="des">课程描述 :</p>
-        <el-input v-model="des" placeholder="请输入内容"></el-input>
+        <p class="tips">项目介绍 :</p>
+        <el-input v-model="description" placeholder="请输入内容"></el-input>
       </div>
       <div class="lesson-avatar">
-        <p class="avatars">课程封面 :</p>
+        <p class="avatars">项目封面 :</p>
         <div class="upload">
           <el-upload
             class="avatar-uploader"
@@ -50,7 +30,7 @@
       </div>
       <div class="button">
         <el-button type="primary" plain class="submit-btn" @click="handlesubmit"
-          >创建课程</el-button
+          >保存</el-button
         >
       </div>
     </div>
@@ -59,24 +39,20 @@
 
 <script>
 import qiniuService from "@/global/service/qiniu.js";
-import lessonService from "@/global/service/lesson.js";
+// import projectService from "@/global/service/project.js";
 
 export default {
   data() {
     return {
       name: "",
-      short_name: "",
-      tips: "",
-      des: "",
+      description: "",
       image_url: ""
     };
   },
   created() {},
   methods: {
     handleAvatarSuccess(files) {
-      console.log(123, files);
       qiniuService.upload(files.file).then(res => {
-        console.log(res);
         this.image_url = res;
       });
     },
@@ -94,33 +70,29 @@ export default {
     },
     handlesubmit() {
       let name = this.name;
-      let short_name = this.short_name;
-      let tips = this.tips;
-      let description = this.des;
+      let description = this.description;
       let image_url = this.image_url;
       let created_at = new Date();
-      if (!name || !short_name || !tips || !description || !image_url) {
+      if (!name || !description || !image_url) {
         return this.$message.error("缺少参数！");
       }
       let params = {
         name: this.name,
-        short_name: this.short_name,
-        tips: this.tips,
-        description: this.des,
+        description: this.description,
         image_url: this.image_url,
         created_at: created_at
       };
       console.log(params);
-      lessonService.insert(params).then(res => {
-        console.log(res);
-        if (res.code === 200) {
-          this.$message({
-            type: "success",
-            message: res.message
-          });
-        }
-        this.$router.push({ name: "eduLesson" });
-      });
+      // projectService.insert(params).then(res => {
+      //   console.log(res)
+      //   if (res.code === 200) {
+      //     this.$message({
+      //       type: "success",
+      //       message: res.message
+      //     });
+      //   }
+      //   this.$router.push({ name: "project" });
+      // });
     }
   }
 };

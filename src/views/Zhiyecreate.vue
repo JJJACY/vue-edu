@@ -5,26 +5,6 @@
     </div>
     <div class="clear"></div>
     <div class="body">
-      <!-- <div class="lesson">
-        <div class="lesson-name">
-          <p class="name">课程名称 :</p>
-          <el-input
-            v-model="name"
-            placeholder="请输入内容"
-            clearable
-            style="width: 80%;"
-          ></el-input>
-        </div>
-        <div class="lesson-subtitle">
-          <p class="subtitle">副标题 :</p>
-          <el-input
-            v-model="short_name"
-            placeholder="请输入内容"
-            clearable
-            style="width: 80%;"
-          ></el-input>
-        </div>
-      </div> -->
       <div class="lesson-tips">
         <p class="tips">职业名称 :</p>
         <el-input v-model="name" placeholder="请输入内容"></el-input>

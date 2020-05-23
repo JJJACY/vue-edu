@@ -9,6 +9,12 @@ const eduLessoncreate = () =>
 const eduLessonedit = () =>
   import(/* webpackChunkName: "lessonedit" */ "@/views/eduLessonedit.vue");
 
+const Zhiye = () => import(/* webpackChunkName: "zhiye" */ "@/views/Zhiye.vue");
+const Zhiyecreate = () =>
+  import(/* webpackChunkName: "zhiyecreate" */ "@/views/Zhiyecreate.vue");
+const Zhiyeedit = () =>
+  import(/* webpackChunkName: "zhiyeedit" */ "@/views/Zhiyeedit.vue");
+
 const Company = () =>
   import(/* webpackChunkName: "company" */ "@/views/Company.vue");
 const Companycreate = () =>
@@ -16,17 +22,22 @@ const Companycreate = () =>
 const Companyedit = () =>
   import(/* webpackChunkName: "companyedit" */ "@/views/Companyedit.vue");
 
+const Project = () =>
+  import(/* webpackChunkName: "project" */ "@/views/Project.vue");
+const Projectcreate = () =>
+  import(/* webpackChunkName: "projectcreate" */ "@/views/Projectcreate.vue");
+const Projectedit = () =>
+  import(/* webpackChunkName: "projectedit" */ "@/views/Projectedit.vue");
+const Projectdetail = () =>
+  import(
+    /* webpackChunkName: "projectdetailProjectdetail" */ "@/views/Projectdetail.vue"
+  );
+
 const Stack = () => import(/* webpackChunkName: "stack" */ "@/views/Stack.vue");
 const Stackcreate = () =>
   import(/* webpackChunkName: "stackcreate" */ "@/views/Stackcreate.vue");
 const Stackedit = () =>
   import(/* webpackChunkName: "stackedit" */ "@/views/Stackedit.vue");
-
-const Zhiye = () => import(/* webpackChunkName: "zhiye" */ "@/views/Zhiye.vue");
-const Zhiyecreate = () =>
-  import(/* webpackChunkName: "zhiyecreate" */ "@/views/Zhiyecreate.vue");
-const Zhiyeedit = () =>
-  import(/* webpackChunkName: "zhiyeedit" */ "@/views/Zhiyeedit.vue");
 import BasicLayout from "@/components/BasicLayout.vue";
 
 export default [
@@ -173,6 +184,58 @@ export default [
             meta: {
               breadcrumb: {
                 title: "企业编辑"
+              }
+            }
+          }
+        ]
+      },
+      {
+        path: "/admin/project",
+        name: "projectRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "project" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "项目管理"
+          },
+          breadcrumb: {
+            title: "项目"
+          }
+        },
+        children: [
+          {
+            path: "/admin/project",
+            name: "project",
+            component: Project
+          },
+          {
+            path: "/admin/project/create",
+            name: "projectcreate",
+            component: Projectcreate,
+            meta: {
+              breadcrumb: {
+                title: "创建"
+              }
+            }
+          },
+          {
+            path: "/admin/project/detail",
+            name: "projectdetail",
+            component: Projectdetail,
+            meta: {
+              breadcrumb: {
+                title: "详情"
+              }
+            }
+          },
+          {
+            path: "/admin/project/edit",
+            name: "projectedit",
+            component: Projectedit,
+            meta: {
+              breadcrumb: {
+                title: "编辑"
               }
             }
           }
