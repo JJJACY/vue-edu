@@ -134,7 +134,7 @@
                   autocomplete="off"
                 ></el-input>
               </el-form-item>
-              <el-form-item prop="password">
+              <!-- <el-form-item prop="password">
                 <el-input
                   type="password"
                   prefix-icon="el-icon-lock"
@@ -142,7 +142,7 @@
                   v-model="passwordFrom.password"
                   autocomplete="off"
                 ></el-input>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item prop="checked">
                 <div class="flex-cell">
                   <el-checkbox
@@ -223,7 +223,8 @@
 <script>
 import DataStore from "@/global/storage/index.js";
 import noteService from "@/global/service/note.js";
-import adminService from "@/global/service/admin.js";
+// import adminService from "@/global/service/admin.js";
+import managerService from "@/global/service/manager.js";
 export default {
   data() {
     return {
@@ -257,8 +258,8 @@ export default {
             message: "目前只支持中国大陆的手机号码",
             trigger: "blur"
           }
-        ],
-        password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+        ]
+        // password: [{ required: true, message: "请输入密码", trigger: "blur" }]
       },
       buttonName: "获取验证码",
       disabled: false
@@ -324,17 +325,14 @@ export default {
     handlesubmit() {
       //账号密码登陆
       let phone = this.passwordFrom.phone;
-      let password = this.passwordFrom.password;
-      console.log(phone, password);
-      if (!phone || !password) {
-        return this.$message.error("请先输入账号密码");
+      console.log(phone);
+      if (!phone) {
+        return this.$message.error("请先输入电话");
       }
-      adminService.adminlogin({ phone, password }).then(res => {
+      managerService.login({ phone }).then(res => {
         console.log(res.token, 55555);
         if (res.code === 200) {
           DataStore.setToken(res.token);
-          // DataStore.setName(res.data.name);
-          // DataStore.setStatus(res.data.status);
           this.$message({
             type: "success",
             message: res.message
@@ -347,6 +345,30 @@ export default {
           });
         }
       });
+
+      //原版
+      // let phone = this.passwordFrom.phone;
+      // let password = this.passwordFrom.password;
+      // console.log(phone, password);
+      // if (!phone || !password) {
+      //   return this.$message.error("请先输入账号密码");
+      // }
+      // adminService.login({ phone, password }).then(res => {
+      //   console.log(res.token, 55555);
+      //   if (res.code === 200) {
+      //     DataStore.setToken(res.token);
+      //     this.$message({
+      //       type: "success",
+      //       message: res.message
+      //     });
+      //     this.$router.replace({ name: "eduLesson" });
+      //   } else {
+      //     this.$message({
+      //       type: "fail",
+      //       message: res.message
+      //     });
+      //   }
+      // });
     }
   }
 };

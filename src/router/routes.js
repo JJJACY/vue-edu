@@ -1,5 +1,5 @@
 const Dashboard = () =>
-  import(/* webpackChunkName: "Dashboard" */ "@/views/Dashboard.vue");
+  import(/* webpackChunkName: "dashboard" */ "@/views/Dashboard.vue");
 const eduLogin = () =>
   import(/* webpackChunkName: "eduLogin" */ "@/views/eduLogin.vue");
 const eduLesson = () =>
@@ -38,6 +38,27 @@ const Stackcreate = () =>
   import(/* webpackChunkName: "stackcreate" */ "@/views/Stackcreate.vue");
 const Stackedit = () =>
   import(/* webpackChunkName: "stackedit" */ "@/views/Stackedit.vue");
+
+const Skill = () => import(/* webpackChunkName: "skill" */ "@/views/Skill.vue");
+const Skillcreate = () =>
+  import(/* webpackChunkName: "skillcreate" */ "@/views/Skillcreate.vue");
+const Skilledit = () =>
+  import(/* webpackChunkName: "skilledit" */ "@/views/Skilledit.vue");
+
+const Manager = () =>
+  import(/* webpackChunkName: "manager" */ "@/views/Manager.vue");
+const Managercreate = () =>
+  import(/* webpackChunkName: "managercreate" */ "@/views/Managercreate.vue");
+const Manageredit = () =>
+  import(/* webpackChunkName: "manageredit" */ "@/views/Manageredit.vue");
+
+const Player = () =>
+  import(/* webpackChunkName: "player" */ "@/views/Player.vue");
+const Playercreate = () =>
+  import(/* webpackChunkName: "playercreate" */ "@/views/Playercreate.vue");
+const Playeredit = () =>
+  import(/* webpackChunkName: "playeredit" */ "@/views/Playeredit.vue");
+
 import BasicLayout from "@/components/BasicLayout.vue";
 
 export default [
@@ -53,25 +74,19 @@ export default [
     redirect: { name: "Dashboard" },
     children: [
       {
-        path: "/admin",
-        component: { render: h => h("router-view") },
+        path: "/dashboard",
+        component: Dashboard,
         name: "Dashboard",
-        // meta: {
-        //   nav: {
-        //     icon: "el-icon-pie-chart",
-        //     title: "概况"
-        //   },
-        //   breadcrumb: {
-        //     title: "概况"
-        //   }
-        // },
-        children: [
-          {
-            path: "/admin",
-            name: "Dashboard",
-            component: Dashboard
-          }
-        ]
+        meta: {
+          nav: {
+            icon: "el-icon-pie-chart",
+            title: "概况"
+          },
+          breadcrumb: {
+            title: "概况"
+          },
+          slug: "company"
+        }
       },
       {
         path: "/admin/lesson",
@@ -85,13 +100,17 @@ export default [
           },
           breadcrumb: {
             title: "课程管理"
-          }
+          },
+          slug: "course"
         },
         children: [
           {
             path: "/admin/lesson",
             name: "eduLesson",
-            component: eduLesson
+            component: eduLesson,
+            meta: {
+              slug: "course"
+            }
           },
           {
             path: "/admin/lesson/create",
@@ -99,18 +118,20 @@ export default [
             component: eduLessoncreate,
             meta: {
               breadcrumb: {
-                title: "课程创建"
-              }
+                title: "创建"
+              },
+              slug: "course"
             }
           },
           {
-            path: "/admin/lesson/edit",
+            path: "/admin/lesson/edit/:id",
             name: "eduLessonedit",
             component: eduLessonedit,
             meta: {
               breadcrumb: {
-                title: "课程编辑"
-              }
+                title: "编辑"
+              },
+              slug: "course"
             }
           }
         ]
@@ -127,27 +148,38 @@ export default [
           },
           breadcrumb: {
             title: "职业路径"
-          }
+          },
+          slug: "path"
         },
         children: [
           {
             path: "/admin/zhiye",
             name: "zhiye",
-            component: Zhiye
+            component: Zhiye,
+            meta: {
+              slug: "path"
+            }
           },
           {
             path: "/admin/zhiye/create",
             name: "zhiyecreate",
-            component: Zhiyecreate
+            component: Zhiyecreate,
+            meta: {
+              breadcrumb: {
+                title: "创建"
+              },
+              slug: "path"
+            }
           },
           {
-            path: "/admin/zhiye/edit",
+            path: "/admin/zhiye/edit/:id",
             name: "zhiyeedit",
             component: Zhiyeedit,
             meta: {
               breadcrumb: {
-                title: "职业编辑"
-              }
+                title: "编辑"
+              },
+              slug: "path"
             }
           }
         ]
@@ -164,27 +196,38 @@ export default [
           },
           breadcrumb: {
             title: "企业管理"
-          }
+          },
+          slug: "company"
         },
         children: [
           {
             path: "/admin/company",
             name: "company",
-            component: Company
+            component: Company,
+            meta: {
+              slug: "company"
+            }
           },
           {
             path: "/admin/company/create",
             name: "companycreate",
-            component: Companycreate
+            component: Companycreate,
+            meta: {
+              breadcrumb: {
+                title: "创建"
+              },
+              slug: "company"
+            }
           },
           {
-            path: "/admin/company/edit",
+            path: "/admin/company/edit/:id",
             name: "companyedit",
             component: Companyedit,
             meta: {
               breadcrumb: {
-                title: "企业编辑"
-              }
+                title: "编辑"
+              },
+              slug: "company"
             }
           }
         ]
@@ -201,13 +244,18 @@ export default [
           },
           breadcrumb: {
             title: "项目"
-          }
+          },
+          slug: "project"
         },
         children: [
           {
             path: "/admin/project",
             name: "project",
-            component: Project
+            component: Project,
+            meta: {
+              slug: "project"
+            },
+            slug: "project"
           },
           {
             path: "/admin/project/create",
@@ -217,27 +265,30 @@ export default [
               breadcrumb: {
                 title: "创建"
               }
-            }
+            },
+            slug: "project"
           },
           {
-            path: "/admin/project/detail",
+            path: "/admin/project/detail/:id",
             name: "projectdetail",
             component: Projectdetail,
             meta: {
               breadcrumb: {
                 title: "详情"
               }
-            }
+            },
+            slug: "project"
           },
           {
-            path: "/admin/project/edit",
+            path: "/admin/project/edit/:id",
             name: "projectedit",
             component: Projectedit,
             meta: {
               breadcrumb: {
                 title: "编辑"
               }
-            }
+            },
+            slug: "project"
           }
         ]
       },
@@ -253,13 +304,17 @@ export default [
           },
           breadcrumb: {
             title: "技能"
-          }
+          },
+          slug: "skill"
         },
         children: [
           {
             path: "/admin/stack",
             name: "stack",
-            component: Stack
+            component: Stack,
+            meta: {
+              slug: "skill"
+            }
           },
           {
             path: "/admin/stack/create",
@@ -268,58 +323,183 @@ export default [
             meta: {
               breadcrumb: {
                 title: "创建"
-              }
+              },
+              slug: "skill"
             }
           },
           {
-            path: "/admin/stack/edit",
+            path: "/admin/stack/edit/:id",
             name: "stackedit",
             component: Stackedit,
             meta: {
               breadcrumb: {
-                title: "技能编辑"
-              }
+                title: "编辑"
+              },
+              slug: "skill"
             }
           }
         ]
+      },
+      {
+        path: "/admin/skill",
+        name: "skillRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "skill" },
+        meta: {
+          nav: {
+            icon: "el-icon-collection-tag",
+            title: "题库管理"
+          },
+          breadcrumb: {
+            title: "题库管理"
+          },
+          slug: "question"
+        },
+        children: [
+          {
+            path: "/admin/skill",
+            name: "skill",
+            component: Skill,
+            meta: {
+              slug: "question"
+            }
+          },
+          {
+            path: "/admin/skill/create",
+            name: "skillcreate",
+            component: Skillcreate,
+            meta: {
+              breadcrumb: {
+                title: "创建"
+              },
+              slug: "question"
+            }
+          },
+          {
+            path: "/admin/skill/edit/:id",
+            name: "skilledit",
+            component: Skilledit,
+            meta: {
+              breadcrumb: {
+                title: "编辑"
+              },
+              slug: "question"
+            }
+          }
+        ]
+      },
+      {
+        path: "/admin/root",
+        name: "Root",
+        component: { render: h => h("router-view") },
+        redirect: { name: "manageroot" },
+        meta: {
+          nav: {
+            icon: "el-icon-setting",
+            title: "管理设置"
+          },
+          breadcrumb: {
+            title: "设置"
+          },
+          slug: "manage"
+        },
+        children: [
+          {
+            path: "/admin/root/manager",
+            name: "manageroot",
+            component: { render: h => h("router-view") },
+            meta: {
+              nav: {
+                icon: "el-icon-user-solid",
+                title: "管理员"
+              },
+              breadcrumb: {
+                title: "管理员"
+              },
+              slug: "manage"
+            },
+            children: [
+              {
+                path: "/admin/root/manager",
+                name: "manager",
+                component: Manager,
+                meta: {
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/root/manager/create",
+                name: "managercreate",
+                component: Managercreate,
+                meta: {
+                  breadcrumb: {
+                    title: "创建"
+                  },
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/root/manager/edit/:id",
+                name: "manageredit",
+                component: Manageredit,
+                meta: {
+                  breadcrumb: {
+                    title: "编辑"
+                  },
+                  slug: "manage"
+                }
+              }
+            ]
+          },
+          {
+            path: "/admin/root/player",
+            name: "playerroot",
+            component: { render: h => h("router-view") },
+            meta: {
+              nav: {
+                icon: "el-icon-user-solid",
+                title: "角色"
+              },
+              breadcrumb: {
+                title: "角色"
+              },
+              slug: "manage"
+            },
+            children: [
+              {
+                path: "/admin/root/player",
+                name: "player",
+                component: Player,
+                meta: {
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/root/player/create",
+                name: "playercreate",
+                component: Playercreate,
+                meta: {
+                  breadcrumb: {
+                    title: "创建"
+                  },
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/root/player/edit/:id",
+                name: "playeredit",
+                component: Playeredit,
+                meta: {
+                  breadcrumb: {
+                    title: "编辑"
+                  },
+                  slug: "manage"
+                }
+              }
+            ]
+          }
+        ]
       }
-      // {
-      //   path: "/admin/skill",
-      //   name: "skillRoot",
-      //   component: { render: h => h("router-view") },
-      //   redirect: { name: "skill" },
-      //   meta: {
-      //     nav: {
-      //       icon: "el-icon-collection-tag",
-      //       title: "题库管理"
-      //     },
-      //     breadcrumb: {
-      //       title: "题库管理"
-      //     }
-      //   },
-      //   children: [
-      //     {
-      //       path: "/admin/skill",
-      //       name: "skill",
-      //       component: Skill
-      //     },
-      //     {
-      //       path: "/admin/skill/create",
-      //       name: "skillcreate",
-      //       component: Skillcreate
-      //     },
-      //     {
-      //       path: "/admin/skill/edit",
-      //       name: "skilledit",
-      //       component: Skilledit,
-      //       meta: {
-      //         breadcrumb: {
-      //           title: "题库编辑"
-      //         }
-      //       }
-      //     }
-      //   ]
-      // },
     ]
   }
 ];

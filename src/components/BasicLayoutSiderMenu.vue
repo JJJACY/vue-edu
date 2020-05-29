@@ -41,6 +41,9 @@
 
 <script>
 import routes from "@/router/routes";
+import DataStore from "@/global/storage/index.js";
+import managerService from "@/global/service/manager.js";
+
 export default {
   props: {
     collapse: {
@@ -51,15 +54,23 @@ export default {
   data() {
     return {
       path: this.$route.path,
-      filterRoutes: []
+      filterRoutes: [],
+      permission_slug: []
     };
   },
   created() {
-    this.getRoutes();
+    let Token = DataStore.getToken();
+    managerService.authority({ Token }).then(res => {
+      this.permission_slug = res.data[0].permission_slug.split(",");
+      this.getRoutes();
+    });
+
+    // this.Authority();
   },
   watch: {
     $route(to) {
       this.path = to.path;
+      this.Authority();
     }
   },
   methods: {
@@ -78,7 +89,11 @@ export default {
           if (data.children) {
             item.children = this.filterNavigator(data.children);
           }
-          result.push(item);
+          this.permission_slug.some(newData => {
+            if (newData == item.meta.slug) {
+              result.push(item);
+            }
+          });
         } else if (data.children) {
           this.filterNavigator(data.children).forEach(item =>
             result.push(item)
@@ -90,6 +105,21 @@ export default {
     hasNavChildren(route) {
       const children = route.children || [];
       return children.some(data => data.meta && data.meta.nav);
+    },
+    Authority() {
+      let role_permission = this.$route.meta.slug;
+      let Token = DataStore.getToken();
+      managerService.authority({ Token }).then(res => {
+        let permission_slug = res.data[0].permission_slug.split(",");
+        let arr = permission_slug.some(data => data == role_permission);
+        if (!arr) {
+          this.$message({
+            type: "warning",
+            message: "您没有权限查看这个板块，请联络管理员授权"
+          });
+          this.$router.push({ name: "admin" });
+        }
+      });
     }
   }
 };
