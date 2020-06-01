@@ -59,6 +59,21 @@ const Playercreate = () =>
 const Playeredit = () =>
   import(/* webpackChunkName: "playeredit" */ "@/views/Playeredit.vue");
 
+const Advertise = () =>
+  import(/* webpackChunkName: "advertise" */ "@/views/Advertise.vue");
+const Advertisecreate = () =>
+  import(
+    /* webpackChunkName: "advertisecreate" */ "@/views/Advertisecreate.vue"
+  );
+const Advertiseedit = () =>
+  import(/* webpackChunkName: "advertiseedit" */ "@/views/Advertiseedit.vue");
+
+const Material = () =>
+  import(/* webpackChunkName: "material" */ "@/views/Material.vue");
+const Materialcreate = () =>
+  import(/* webpackChunkName: "materialcreate" */ "@/views/Materialcreate.vue");
+const Materialedit = () =>
+  import(/* webpackChunkName: "materialedit" */ "@/views/Materialedit.vue");
 import BasicLayout from "@/components/BasicLayout.vue";
 
 export default [
@@ -489,6 +504,112 @@ export default [
                 path: "/admin/root/player/edit/:id",
                 name: "playeredit",
                 component: Playeredit,
+                meta: {
+                  breadcrumb: {
+                    title: "编辑"
+                  },
+                  slug: "manage"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        path: "/admin/advertise",
+        name: "advertiseRoot",
+        component: { render: h => h("router-view") },
+        redirect: { name: "advertise" },
+        meta: {
+          nav: {
+            icon: "el-icon-s-cooperation",
+            title: "广告物料"
+          },
+          breadcrumb: {
+            title: "广告管理"
+          },
+          slug: "manage"
+        },
+        children: [
+          {
+            path: "/admin/advertise",
+            name: "advertise",
+            component: { render: h => h("router-view") },
+            meta: {
+              nav: {
+                icon: "el-icon-s-goods",
+                title: "广告管理"
+              },
+              slug: "manage"
+            },
+            children: [
+              {
+                path: "/admin/advertise",
+                name: "advertise",
+                component: Advertise,
+                meta: {
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/advertise/create",
+                name: "advertisecreate",
+                component: Advertisecreate,
+                meta: {
+                  breadcrumb: {
+                    title: "创建"
+                  },
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/advertise//edit/:id",
+                name: "advertiseedit",
+                component: Advertiseedit,
+                meta: {
+                  breadcrumb: {
+                    title: "编辑"
+                  },
+                  slug: "manage"
+                }
+              }
+            ]
+          },
+          {
+            path: "/admin/material",
+            name: "material",
+            component: { render: h => h("router-view") },
+            meta: {
+              nav: {
+                icon: "el-icon-picture",
+                title: "物料管理"
+              },
+              slug: "manage"
+            },
+            children: [
+              {
+                path: "/admin/material",
+                name: "material",
+                component: Material,
+                meta: {
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/material/create",
+                name: "materialcreate",
+                component: Materialcreate,
+                meta: {
+                  breadcrumb: {
+                    title: "创建"
+                  },
+                  slug: "manage"
+                }
+              },
+              {
+                path: "/admin/material/edit",
+                name: "materialedit",
+                component: Materialedit,
                 meta: {
                   breadcrumb: {
                     title: "编辑"
