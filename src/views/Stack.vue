@@ -37,6 +37,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="block">
+        <el-pagination
+          layout="prev, pager, next"
+          :total="pagination.total"
+          :page-size="pagination.pageSize"
+          :current-page.sync="pagination.nowPage"
+          @current-change="handlechange"
+        >
+        </el-pagination>
+      </div>
     </template>
   </div>
 </template>
@@ -46,8 +56,12 @@ import stackService from "@/global/service/stack.js";
 export default {
   data() {
     return {
-      stackData: []
-      // currentRow: null
+      stackData: [],
+      pagination: {
+        pageSize: 10,
+        total: 0,
+        nowPage: 1
+      }
     };
   },
   created() {
@@ -56,9 +70,9 @@ export default {
   methods: {
     getData() {
       stackService.all().then(res => {
-        console.log(res);
         if (res.code === 200) {
           this.stackData = res.data;
+          this.pagination.total = res.total;
         }
       });
     },
@@ -93,7 +107,21 @@ export default {
         // this.lessonData.splice(index, 1);
         // this.getData();
       });
+    },
+    handlechange() {
+      let nowPage = this.pagination.nowPage;
+      stackService.pagina({ nowPage }).then(res => {
+        if (res.code == 200) {
+          this.stackData = res.data;
+        }
+      });
     }
+    // handleprev(){
+    //   console.log(this.pagination.nowPage)
+    // },
+    // hanlenext(){
+    //   console.log(this.pagination.nowPage)
+    // }
   }
 };
 </script>
@@ -108,5 +136,8 @@ export default {
 .clearboth {
   margin-bottom: 20px;
   clear: both;
+}
+.block {
+  margin-top: 20px;
 }
 </style>
